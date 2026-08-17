@@ -2,7 +2,7 @@ import json, os
 D = os.path.dirname(os.path.abspath(__file__))
 F = os.path.join(D, "out_fig")
 b = {k: open(f"{F}/{k}.png.b64").read() for k in
-     ["encoders", "layers", "transfer", "acoustics", "replication", "room", "leakage", "matrix3", "pigs", "bats", "construct", "encoders3", "stress", "shared_direction", "audit_table", "inflation_law", "recovery"]}
+     ["encoders", "layers", "transfer", "acoustics", "replication", "room", "leakage", "matrix3", "pigs", "bats", "construct", "encoders3", "stress", "shared_direction", "audit_table", "inflation_law", "recovery", "multiband"]}
 
 CSS = """
 :root{--bg:#EFF2F3;--surface:#FBFCFC;--surface-2:#E4EAEB;--surface-3:#DAE2E3;--ink:#0F1A1C;--ink-2:#42565A;--ink-3:#6C8084;--rule:#CBD6D8;--rule-soft:#DDE5E6;--accent:#9A5205;--cyan:#0A626D;--mag:#8A3459;--ok:#2C6349;--ok-bg:#DCEBE3;--warn:#7E5A0C;--warn-bg:#F0E7D0;--bad:#8A3459;--bad-bg:#F2DEE7;--dim:#5C6E71;--dim-bg:#E1E7E8;--shadow:0 1px 2px rgba(15,26,28,.06),0 8px 24px -16px rgba(15,26,28,.28);--mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,"Cascadia Mono",monospace;--serif:Charter,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--measure:70ch;color-scheme:light}
@@ -128,6 +128,12 @@ HTML = f"""<title>Identity, Not Context</title>
 
 <div class="grid g2">
 <figure><img src="data:image/png;base64,{b['bats']}" alt="Bat identity decodability"><figcaption><b>Wild bats: identity dominance is not a domestic-animal quirk.</b> 10-way identity at 0.63&ndash;0.70 (chance 0.10). A 4&times; time-stretch, which folds 0&ndash;32&nbsp;kHz into the encoder&rsquo;s 8&nbsp;kHz band, lifts WavLM identity from 0.631 to <b>0.700</b>. Honest label: that is the <em>time-expansion baseline</em> ESP&rsquo;s own multiband method (Sarkar et al. 2026) is built to beat &mdash; a known trick reproduced on a wild species, not a new result. The BEANS packaging carries no context labels, so bats sit in Paper A, not B.</figcaption></figure>
+<figure><img src="data:image/png;base64,{b['multiband']}" alt="Multiband vs time-expansion on bat identity"><figcaption><b>We ran ESP&rsquo;s own multiband package against our baseline &mdash; and it did not win here.</b> 10-way bat identity, 1,000 calls: time-expansion 0.666 (WavLM) and 0.641 (AVES) beat multiband-concat 0.637 / 0.616 and multiband-mean 0.604 / 0.561. <b>But this does not refute their method:</b> we could only test the parameter-free fusions, and the paper&rsquo;s headline is <em>adaptive</em> gated fusion trained end-to-end, which is incompatible with a frozen-encoder + per-layer probe. A learned gate could close a 0.03 gap.</figcaption></figure>
+<div class="note"><h4>Two checkable notes about the released code (v0.1.0)</h4><ul>
+<li><b>The heterodyne is a single-phase mixer, so each non-baseband band folds 2:1.</b> Tone test: 9&nbsp;kHz and 15&nbsp;kHz both land at 3&nbsp;kHz in band&nbsp;1; a sine exactly at the 12&nbsp;kHz band centre is nulled (rms 0.0006) while a cosine passes (0.500). No quadrature path.</li>
+<li><b>Bands overlap.</b> The band-pass is one 2nd-order biquad, not a brick wall: a 15&nbsp;kHz tone reads rms 0.287 in band&nbsp;1 <em>and</em> 0.176 in band&nbsp;2 (&asymp;&minus;4&nbsp;dB leak). The README&rsquo;s &ldquo;non-overlapping bands&rdquo; is aspirational at this version.</li>
+<li><b>Energy does not predict usefulness:</b> 76.2% of bat call energy sits in band&nbsp;1, yet band&nbsp;0 alone out-probes band&nbsp;1 alone by ~9 points. And mean-fusion is <em>actively harmful</em> for AVES (&minus;0.049 vs its own baseband, p=0.004) &mdash; averaging dilutes the one informative band.</li>
+</ul></div>
 <figure><img src="data:image/png;base64,{b['construct']}" alt="Pig probe on cat contexts"><figcaption><b>Construct validity, passed.</b> The cat context we <em>excluded before looking</em> as ambiguous &mdash; waiting for food &mdash; is rated by the pig-trained probe at 0.495, exactly between brushing (0.443) and isolation (0.621). An affect-like axis should do precisely that.</figcaption></figure>
 </div>
 

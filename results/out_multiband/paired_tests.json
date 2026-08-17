@@ -1,0 +1,146 @@
+{
+ "wavlm|timeexp4x|vs|multiband_concat": {
+  "acc_a": 0.666,
+  "acc_b": 0.637,
+  "diff": 0.029000000000000026,
+  "ci95": [
+   -0.0020250000000000003,
+   0.06300000000000006
+  ],
+  "mcnemar_b_only": 123,
+  "mcnemar_a_only": 152,
+  "mcnemar_p": 0.09114048688971829
+ },
+ "wavlm|timeexp4x|vs|multiband_mean": {
+  "acc_a": 0.666,
+  "acc_b": 0.604,
+  "diff": 0.062000000000000055,
+  "ci95": [
+   0.030000000000000027,
+   0.09602499999999994
+  ],
+  "mcnemar_b_only": 114,
+  "mcnemar_a_only": 176,
+  "mcnemar_p": 0.00032511574012989477
+ },
+ "wavlm|multiband_concat|vs|multiband_band0_only": {
+  "acc_a": 0.637,
+  "acc_b": 0.6,
+  "diff": 0.03700000000000003,
+  "ci95": [
+   0.0050000000000000044,
+   0.06700000000000006
+  ],
+  "mcnemar_b_only": 121,
+  "mcnemar_a_only": 158,
+  "mcnemar_p": 0.030957208396401054
+ },
+ "wavlm|multiband_mean|vs|multiband_band0_only": {
+  "acc_a": 0.604,
+  "acc_b": 0.6,
+  "diff": 0.0040000000000000036,
+  "ci95": [
+   -0.028025000000000022,
+   0.03600000000000003
+  ],
+  "mcnemar_b_only": 132,
+  "mcnemar_a_only": 136,
+  "mcnemar_p": 0.8546420405717399
+ },
+ "wavlm|multiband_concat|vs|baseband": {
+  "acc_a": 0.637,
+  "acc_b": 0.587,
+  "diff": 0.050000000000000044,
+  "ci95": [
+   0.017000000000000015,
+   0.08299999999999996
+  ],
+  "mcnemar_b_only": 112,
+  "mcnemar_a_only": 162,
+  "mcnemar_p": 0.0030045955582538473
+ },
+ "wavlm|baseband|vs|multiband_band0_only": {
+  "acc_a": 0.587,
+  "acc_b": 0.6,
+  "diff": -0.013000000000000012,
+  "ci95": [
+   -0.041000000000000036,
+   0.013999999999999905
+  ],
+  "mcnemar_b_only": 103,
+  "mcnemar_a_only": 90,
+  "mcnemar_p": 0.3877628782642032
+ },
+ "aves-bio|timeexp4x|vs|multiband_concat": {
+  "acc_a": 0.641,
+  "acc_b": 0.616,
+  "diff": 0.025000000000000022,
+  "ci95": [
+   -0.006000000000000005,
+   0.05600000000000005
+  ],
+  "mcnemar_b_only": 115,
+  "mcnemar_a_only": 140,
+  "mcnemar_p": 0.13269564289654973
+ },
+ "aves-bio|timeexp4x|vs|multiband_mean": {
+  "acc_a": 0.641,
+  "acc_b": 0.561,
+  "diff": 0.07999999999999996,
+  "ci95": [
+   0.04600000000000004,
+   0.11199999999999999
+  ],
+  "mcnemar_b_only": 110,
+  "mcnemar_a_only": 190,
+  "mcnemar_p": 4.500723756840062e-06
+ },
+ "aves-bio|multiband_concat|vs|multiband_band0_only": {
+  "acc_a": 0.616,
+  "acc_b": 0.61,
+  "diff": 0.006000000000000005,
+  "ci95": [
+   -0.02702500000000002,
+   0.039000000000000035
+  ],
+  "mcnemar_b_only": 141,
+  "mcnemar_a_only": 147,
+  "mcnemar_p": 0.7683380076782963
+ },
+ "aves-bio|multiband_mean|vs|multiband_band0_only": {
+  "acc_a": 0.561,
+  "acc_b": 0.61,
+  "diff": -0.04899999999999993,
+  "ci95": [
+   -0.08199999999999996,
+   -0.018000000000000016
+  ],
+  "mcnemar_b_only": 166,
+  "mcnemar_a_only": 117,
+  "mcnemar_p": 0.00424489449888178
+ },
+ "aves-bio|multiband_concat|vs|baseband": {
+  "acc_a": 0.616,
+  "acc_b": 0.608,
+  "diff": 0.008000000000000007,
+  "ci95": [
+   -0.02300000000000002,
+   0.039000000000000035
+  ],
+  "mcnemar_b_only": 124,
+  "mcnemar_a_only": 132,
+  "mcnemar_p": 0.6618328607844559
+ },
+ "aves-bio|baseband|vs|multiband_band0_only": {
+  "acc_a": 0.608,
+  "acc_b": 0.61,
+  "diff": -0.0020000000000000018,
+  "ci95": [
+   -0.03500000000000003,
+   0.030000000000000027
+  ],
+  "mcnemar_b_only": 133,
+  "mcnemar_a_only": 131,
+  "mcnemar_p": 0.9509400800412556
+ }
+}
