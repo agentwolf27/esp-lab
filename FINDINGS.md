@@ -464,3 +464,30 @@ If dog→cat holds there too, it is a property of frozen encoders generally; if 
 property (which would itself be interesting — speech pretraining as the carrier).
 
 ## eGeMAPS added to Paper A (see above): honest handcrafted baseline 0.486; encoders +0.07–0.09 over it.
+
+## AVES-bio (third encoder family — bioacoustic, not speech) — the 3×3
+
+| cell | WavLM | HuBERT | AVES-bio |
+|---|---|---|---|
+| dog→cat | **0.583 (p=.015)** | 0.561 (p=.060) | 0.537 (p=.23) |
+| pig→cat | **0.591 (p=.005)** | 0.530 (p=.23) | **0.608 (p=.040)** |
+| cat→pig | 0.524 (p=.10) | 0.523 (p=.14) | **0.559 (p=.040)** |
+| pig→dog | 0.523 (p=.25) | 0.493 (p=.55) | 0.565 (p=.085) |
+| cat→dog | 0.527 (p=.59) | — | 0.456 (p=.78) |
+| dog→pig | 0.495 (p=.56) | — | 0.469 (p=.82) |
+| placebo (sex→affect) | 0.51 | — | 0.487 |
+| pig within, held-out lab | 0.660 | 0.628 | **0.679** |
+
+**Reading.** No cell is significant in all three encoders. **pig→cat is significant in two of three**
+(WavLM, AVES); dog→cat in one plus a borderline. Every encoder finds at least one species pair that
+transfers *into cats* above chance, but *which* pair differs. AVES — a bioacoustic model — is the only
+one where anything transfers *out* of cats (cat→pig 0.559). Placebos stay at chance in all.
+
+Honest Paper-B sentence, final form:
+> *Across three frozen encoder families, an affect axis learned on one species predicts cat contexts
+> above chance in every encoder, but the specific source species that transfers is encoder-dependent
+> and no cell is unanimous; the effect is small, placebo-clean, roughly half explained by call duration,
+> and should be read as "encoders share some coarse arousal structure across mammals" rather than as
+> a stable cross-species code.*
+
+Figure: `figures/encoders3.png`. Data: `results/out_pigs/aves_matrix.json`, `encoder_consistency.json`.
