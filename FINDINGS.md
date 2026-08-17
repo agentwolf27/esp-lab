@@ -721,3 +721,67 @@ Neither is a criticism of the paper's idea; both are concrete, checkable notes a
 This is the strongest cold-email content we have for ESP: a reproduction of their baseline comparison
 on a dataset they did not use, plus two tone-verified observations about their released code — and
 Gagan Narula, our #1 contact, is a co-author on that paper.
+
+---
+
+# ITERATION 9 — chapters 1 and 4 meet: conformal coverage is per-group broken
+
+Our conformal code had only ever been validated on synthetic data. The audit said per-animal accuracy
+varies wildly (0.00–0.86). Prediction: **marginal coverage will look perfect while per-group coverage
+is catastrophic.** Run on real out-of-fold scores, α=0.10 (nominal 0.90), WavLM L9, calibration/test
+split by group, 40 repeats.
+
+| dataset | marginal | per-group **min** | IQR | groups <0.80 | mean set size |
+|---|---|---|---|---|---|
+| cats (20 individuals) | 0.904 | **0.412** | 0.186 | **5/20** | 1.32 |
+| dogs (10 individuals) | 0.892 | 0.624 | 0.059 | 2/10 | 1.10 |
+| pigs (6 labs) | 0.891 | 0.735 | 0.079 | 1/6 | 1.67 |
+
+Worst offenders: `cat_TIG01` 0.412, `dog_Freid` 0.624, pig lab `IASPB` 0.735. **The headline number is
+exactly on target and one cat in five is getting a guarantee that is 50 points short.**
+
+**It is not a bug in our code.** Synthetic exchangeable control: 0.9048 over 2,000 trials. Real scores
+under an *exchangeable within-group* split: cats 0.907, dogs 0.903, pigs 0.901. And the per-group
+spread is just as wide under the exchangeable split — so this is the **conditional-coverage gap**, a
+known theoretical limitation of conformal prediction, demonstrated on real bioacoustic data.
+
+## Does the textbook fix work? Two important negatives and one positive
+
+- **Mondrian by predicted class — no.** Worst cat 0.412 → 0.425; worst dog unchanged at 0.624; for pigs
+  marginal coverage drops *below* nominal (0.873) and the IQR widens.
+- **Mondrian by group, in deployment — structurally vacuous.** Under a group-disjoint split, no test
+  group has calibration data, so every group falls back to the pooled threshold. Verified
+  programmatically: it is bit-for-bit identical to pooled (0/20, 0/10, 0/6 groups get their own
+  threshold). *The obvious fix does not exist precisely when you need it.*
+- **Mondrian by group, given some of that group's own labels — complete repair, where data allows.**
+  Dogs worst 0.696 → **0.905**, IQR 0.068 → 0.039, 0/10 below 0.80. Pigs worst 0.775 → **0.898**,
+  IQR 0.065 → **0.002**. But **cats: no repair at all** (0.467 → 0.467, still 6/20 below 0.80) —
+  at α=0.10 you need **≥9 calibration clips from that individual**, and only 6 of 20 cats have enough.
+
+**Practitioner rule that falls out:** *α=0.10 requires ≥9 labelled clips from the animal or site you
+are deploying on. Below that, no per-group guarantee is available at any price.* That dovetails exactly
+with the audit's recovery curve (~11 target-cat clips saturate accuracy).
+
+The repair is also **paid for in set size, unevenly**: `dog_Luke` 1.91 (abstains on almost everything)
+vs `dog_Rudy` 0.91 (emits empty sets). Coverage repaired, usefulness redistributed.
+
+## Shift case: species change breaks even the marginal guarantee
+
+Calibrate on dogs, test on cats: marginal coverage **0.747** at L9 and **0.556** at L6, against a 0.920
+same-species reference; worst cat 0.330, 12/20 below 0.80. Cats→dogs 0.746.
+**Swapping individuals within a species costs nothing marginally; swapping species costs 15–35 points.**
+That is the shift ladder the thesis frame predicts, measured.
+
+## Caveats (in the agent's own README)
+- The extreme cat minima come partly from tiny groups. Restricted to the 15 cats with n≥10, the worst
+  is 0.748, IQR 0.113, 3/15 below 0.80 — the effect survives, less dramatically.
+- Per-group coverage is partly confounded with per-group class prior (pig labs IASPB/IASPC are
+  single-valence by construction, as are six cats).
+- OOF scores are cross-conformal-flavoured rather than a single frozen scorer.
+- Pig sets are barely informative anyway (1.67 mean size at 0.63 probe accuracy).
+
+## What this does to Paper A
+It supplies the "so what". The paper no longer just says *your accuracy is inflated*; it says
+**your uncertainty guarantee is also per-group broken, the standard remedy is unavailable in
+deployment, and here is the labelling threshold at which it becomes available.** That is a concrete,
+actionable failure mode — exactly the ICBINB-BIO genre.
