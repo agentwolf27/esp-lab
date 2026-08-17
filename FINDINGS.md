@@ -669,3 +669,55 @@ generalisation is not established and must not be claimed.
   their near-zero inflation is a degenerate zero. Including them would pump pooled r to 0.874 purely as
   leverage; within-bats the correlation is *negative*.
 - Pig WavLM L0 was recomputed from scratch as a reproduction check and matched to within 0.002.
+
+---
+
+# ITERATION 8 — ESP's multiband package vs our time-expansion baseline (bats)
+
+Ran ESP's own `multiband-audio` v0.1.0 (Sarkar et al. 2026, arXiv 2604.27936) on the 10-way bat
+identity task, 1,000 calls (100 × 10 emitters), chance 0.100, best layer:
+
+| encoder | baseband | time-expansion 4× | multiband mean | multiband concat |
+|---|---|---|---|---|
+| WavLM-base-plus | 0.587 (L2) | **0.666** (L1) | 0.604 (L2) | 0.637 (L4) |
+| AVES-bio | 0.608 (L9) | **0.641** (L4) | 0.561 (L2) | 0.616 (L8) |
+
+Paired tests (same folds): time-expansion − multiband-concat = +0.029 (p=0.091) and +0.025 (p=0.13);
+time-expansion − multiband-mean = +0.062 (p=3e-4) and +0.080 (p=5e-6).
+
+**Answer: multiband did not beat time-expansion here — but this does NOT refute ESP's method.**
+We tested only the *parameter-free* fusions (mean, concat). The paper's headline is **adaptive** fusion
+(`gp` gated-pool is their default, plus MoE / hybrid / self-attention), which is learned end-to-end.
+A learned gate could down-weight the weak bands and plausibly close a 0.03 gap. `MultibandWrapper`
+requires a backbone returning one (N,D) vector plus a trained head, which is incompatible with our
+frozen-encoder + per-layer logistic probe, so we used the package's band waveforms and fused ourselves.
+
+## Two verifiable observations about the v0.1.0 package (worth reporting upstream)
+
+1. **The shipped heterodyne is a single-phase mixer, so each non-baseband band folds 2:1.** Verified
+   with tones: 9 kHz and 15 kHz both land at 3 kHz in band 1; a sine exactly at the 12 kHz band centre
+   is nulled (rms 0.0006) while a cosine passes (0.500). There is no quadrature path.
+2. **Bands overlap substantially.** The band-pass is a single 2nd-order biquad, not a brick wall — a
+   15 kHz tone shows rms 0.287 in band 1 *and* 0.176 in band 2 (≈ −4 dB leak). The README's
+   "non-overlapping bands" is aspirational at v0.1.0.
+
+Neither is a criticism of the paper's idea; both are concrete, checkable notes about the released code.
+
+## Two findings worth keeping
+
+- **Energy does not predict usefulness.** 76.2% of bat call energy sits in band 1 (8–16 kHz), yet
+  band 0 alone (0–8 kHz) out-probes band 1 alone by ~9 points (0.600 vs 0.516 WavLM).
+- **Mean-fusion is actively harmful** for AVES: −0.049 against its own baseband band (p=0.004).
+  Averaging dilutes the one informative band.
+
+## Methodological hygiene from this run
+- **Built-in noise ruler:** `baseband` and `band0_only` are the same 0–8 kHz audio down two different
+  resamplers; they differ by 0.013 / 0.002 (n.s.). So ~1–3 points is the noise floor on this task.
+- n=1,000 (half of the `out_bats` run), which is why everything sits ~4 points below it
+  (0.587 vs 0.631; 0.666 vs 0.700) — the *ordering* replicates, which is the part that matters.
+- Best-layer selection is not cross-validated and `C=0.5` was not swept across 768-d vs 3072-d.
+
+## Why this matters beyond the number
+This is the strongest cold-email content we have for ESP: a reproduction of their baseline comparison
+on a dataset they did not use, plus two tone-verified observations about their released code — and
+Gagan Narula, our #1 contact, is a co-author on that paper.
