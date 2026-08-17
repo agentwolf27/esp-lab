@@ -531,3 +531,141 @@ Caveat: probes are fit in-sample on clean audio, so these are decision-**stabili
 generalisation measures. That is the right design for counting flips; it is not an accuracy claim.
 
 Figure `figures/stress.png`; data `results/out_stress/`.
+
+---
+
+# ITERATION 6 — what actually carries the transfer (and what doesn't)
+
+Analysis on cached WavLM embeddings only (no audio): affect directions, 1-D projections, and sparse
+dictionary features across cat / dog / pig. Full detail `results/out_sae/`.
+
+## The naive "shared affect direction" hypothesis is FALSE
+
+Take each species' affect direction w_s = normalize(mean_negative − mean_positive) at layer 9 and
+compare them:
+
+| pair | cosine | null mean±SD (200 perms) | p |
+|---|---|---|---|
+| cat–dog | +0.188 | −0.142±0.194 | 0.065 |
+| cat–pig | +0.012 | −0.001±0.110 | 0.448 |
+| dog–pig | +0.004 | −0.005±0.111 | 0.488 |
+
+Nothing survives at layers 12 or 3 either (one p=0.045 out of 18 comparisons — that is what you expect
+by chance). **The species' affect directions are essentially orthogonal.**
+
+Crucially this is *not* a power problem for pigs: split-half reliability of w_s is cat 0.61, dog 0.41,
+**pig 0.94**. The pig direction is measured extremely precisely and it still points nowhere near the
+others. Cat–dog is attenuated by unreliability (correcting gives +0.374) but still sits inside the null.
+
+## So why does transfer work at all? Whitening.
+
+Transfer as a 1-D projection (AUC, layer 9): **dog→cat 0.790**, pig→cat 0.681, cat→dog 0.632,
+pig→dog 0.590, dog→pig 0.534, cat→pig 0.516. Same asymmetry as before — everything transfers *into*
+cats, nothing into pigs.
+
+The reconciliation: the **mean-difference** axis transfers much worse (dog→cat 0.616) than the
+**logistic probe** (0.790). The probe finds a direction in the covariance-whitened space, not the raw
+class-mean difference. So what is shared across species is not a direction in embedding space — it is
+a direction *relative to each species' own covariance structure*. That also explains the
+encoder-dependence we saw: whitened directions depend on the covariance, which differs per encoder.
+
+## Correction to the earlier "half of it is duration"
+
+Partialling log-duration out of the projection barely moves it (dog→cat 0.790 → 0.777). Where the
+transferred axis tracks a simple acoustic quantity, it is **energy**, not duration (pig→cat ρ=+0.544,
+dog→cat +0.344, cat→dog +0.337).
+
+This does not contradict the kill-test (duration alone transfers at 0.557 balanced accuracy) — both
+are true. Duration is *independently* predictive across species, but the embedding's transfer does not
+run *through* duration. Revised sentence: **duration is a parallel cross-species cue, not the mechanism.**
+
+One genuine oddity: the **pig affect direction essentially IS duration** — cos(w_pig, duration
+direction) = **+0.897**, and the pig affect score correlates with log-duration at ρ=+0.745. Yet pig
+duration does not align with cat/dog duration (+0.008 / −0.275), which is why pigs transfer poorly.
+
+## Sparse features: one shared feature in two species, none in three
+
+MiniBatchDictionaryLearning, 192 atoms, 13 s on CPU, 68.6% variance explained.
+
+- **0 of 192** atoms are affect-selective in all three species.
+- **1 of 192** in ≥2 species with the same sign (null 0.00±0.00 over 200 perms, p=0.005).
+- Per-species selective atoms: cat 9 (null 3.3±1.4), dog 10 (null 0.05±0.24), **pig 0**. The best
+  single pig atom reaches AUC 0.580 across 5,031 calls — pig valence is genuinely distributed, not
+  carried by any sparse feature.
+- **Component 33** (cat 0.299, dog 0.334, pig 0.522): *not* duration (ρ = −0.166/+0.022/+0.090),
+  survives the duration control and a full duration+energy+centroid control (0.392/0.408), and holds
+  when computed *within* each animal (all 10 dogs on the same side).
+- Robustness: FastICA(64) also finds 1-in-≥2 and 0-in-3 — but a *different, uncorrelated* feature
+  (ρ=−0.001). A species-balanced dictionary finds 0 passing.
+
+**Verdict:** there is no single sparse feature that means "distressed" across mammals. There is a
+weak, cat–dog-only shared structure, and it is not explained by the obvious acoustics.
+
+## What this does to Paper B
+
+It makes it a better and more honest paper. The claim is no longer "animals share an affect direction."
+It is: *frozen encoders support above-chance cross-species affect transfer into some species, but the
+shared structure is covariance-relative rather than a common direction, is absent for pigs despite a
+precisely-measured pig affect axis, and is not reducible to duration, energy or any single sparse
+feature.* That is a cautionary methods result about probing, which is exactly the ICBINB genre.
+
+---
+
+# ITERATION 7 — the leakage audit, done properly (Paper A's core)
+
+Four datasets × six feature sets × all layers, one protocol: held-out-group context accuracy vs
+random-split accuracy vs group-identity decodability. Full detail `results/out_audit/`.
+
+| dataset | features | held-out group | random | inflation | group identity | chance (task / id) |
+|---|---|---|---|---|---|---|
+| CatMeows | WavLM (L3) | 0.559 | 0.725 | +0.167 | 0.793 | .333 / .048 |
+| CatMeows | HuBERT (L12) | 0.571 | 0.671 | +0.099 | 0.700 | .333 / .048 |
+| CatMeows | wav2vec2 (L2) | 0.554 | 0.737 | +0.183 | 0.755 | .333 / .048 |
+| CatMeows | AVES-bio (L5) | 0.540 | 0.736 | +0.196 | 0.793 | .333 / .048 |
+| CatMeows | eGeMAPS-88 | 0.492 | 0.628 | +0.136 | 0.727 | .333 / .048 |
+| CatMeows | MFCC-85 | 0.399 | 0.602 | +0.203 | 0.768 | .333 / .048 |
+| Dog barks | WavLM (L6) | **0.728** | 0.878 | +0.150 | 0.817 | .333 / .100 |
+| Dog barks | eGeMAPS-88 | 0.619 | 0.733 | +0.114 | 0.792 | .333 / .100 |
+| Dog barks | MFCC-85 | 0.551 | 0.793 | +0.242 | 0.892 | .333 / .100 |
+| Dog barks | log-duration only | 0.341 | 0.360 | +0.018 | 0.222 | .333 / .100 |
+| Soundwel pigs | WavLM (L0) | 0.660 | 0.883 | +0.223 | **0.938** | .500 / .167 |
+| Soundwel pigs | eGeMAPS-88 | **0.669** | 0.823 | +0.153 | 0.865 | .500 / .167 |
+| Soundwel pigs | paper's 18 features | 0.386 | 0.575 | +0.189 | 0.513 | .500 / .167 |
+| BEANS bats (excluded) | WavLM (L11) | 0.301 | 0.303 | +0.003 | 0.394 | .250 / .100 |
+
+## The inflation law — real *within* a corpus, NOT across corpora
+
+- Pooled (n=83): Pearson **r=0.611, p=8.7e-10**; Spearman 0.610
+- Within-dataset partial: **r=0.646, df=79, p=7.1e-11**
+- Layer-only variation inside a single encoder (n=77): r=0.636, p=2.0e-9; **all six encoder clusters
+  positive** (sign test p=0.031)
+- Neural-only, 768-d (n=77): r=0.694 — not a dimensionality artifact
+- Leverage-safe: dropping the extreme point *raises* r to 0.670; jackknife keeps r ∈ [0.480, 0.689]
+- Identity tracks the **leaky** number (r=0.754) more than the honest one (r=0.509) — exactly what the
+  leakage account predicts
+- ⚠️ **Cluster level (12 independent dataset×feature-set units): r=0.221, p=0.489 — NULL**
+
+**Honest claim:** *among feature sets and layers for a given dataset, the one that leaks less identity
+inflates less.* **Not:** "datasets with more identity leakage inflate more." Earlier I reported the
+cats-only n=5 version (r=0.81, p=0.094); with n=6 it is r=0.866, p=0.026 — but the cross-corpus
+generalisation is not established and must not be claimed.
+
+## Three findings that change the story
+
+1. **eGeMAPS BEATS WavLM on pigs under held-out lab** (0.669 vs 0.660) while leaking less identity
+   (0.865 vs 0.938). The encoder's apparent advantage on pigs lives *entirely in the leaky number.*
+   That is the sharpest single sentence Paper A has.
+2. **Dogs generalise far better than cats or pigs**: held-out-dog context 0.728 (chance 0.333), with a
+   duration-only floor at 0.341 — so it is not a bout-length artifact. Caveat: only 10 dogs, and dog
+   context is confounded with recording session, so this is not a leave-one-session-out number.
+3. **Recovery curves differ in kind.** ~11 labelled clips from the target cat lift WavLM 0.576 → 0.727,
+   which is the random-split ceiling (0.729) — cat "shift" is individual idiosyncrasy a handful of
+   labels fully absorbs. For pigs, 100 labelled clips from the target lab close only **50%** of the gap
+   and are still climbing. eGeMAPS recovers far less in both: the encoder is more *adaptable*, not more
+   *transferable*.
+
+## Honesty notes
+- **Bats excluded from the fit**: no bat context label is decodable at all (0.301 vs 0.250 chance), so
+  their near-zero inflation is a degenerate zero. Including them would pump pooled r to 0.874 purely as
+  leverage; within-bats the correlation is *negative*.
+- Pig WavLM L0 was recomputed from scratch as a reproduction check and matched to within 0.002.
