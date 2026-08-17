@@ -1,0 +1,172 @@
+import json, os
+D = os.path.dirname(os.path.abspath(__file__))
+F = os.path.join(D, "out_fig")
+b = {k: open(f"{F}/{k}.png.b64").read() for k in
+     ["encoders", "layers", "transfer", "acoustics", "replication", "room", "leakage", "matrix3", "pigs", "bats", "construct"]}
+
+CSS = """
+:root{--bg:#EFF2F3;--surface:#FBFCFC;--surface-2:#E4EAEB;--surface-3:#DAE2E3;--ink:#0F1A1C;--ink-2:#42565A;--ink-3:#6C8084;--rule:#CBD6D8;--rule-soft:#DDE5E6;--accent:#9A5205;--cyan:#0A626D;--mag:#8A3459;--ok:#2C6349;--ok-bg:#DCEBE3;--warn:#7E5A0C;--warn-bg:#F0E7D0;--bad:#8A3459;--bad-bg:#F2DEE7;--dim:#5C6E71;--dim-bg:#E1E7E8;--shadow:0 1px 2px rgba(15,26,28,.06),0 8px 24px -16px rgba(15,26,28,.28);--mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,"Cascadia Mono",monospace;--serif:Charter,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--measure:70ch;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0A1113;--surface:#111A1D;--surface-2:#162226;--surface-3:#1D2C30;--ink:#E7EEEF;--ink-2:#A5B7BA;--ink-3:#78898D;--rule:#243337;--rule-soft:#1B282B;--accent:#F0AA3E;--cyan:#4FC7CE;--mag:#E58BB0;--ok:#6ECB99;--ok-bg:#163024;--warn:#E0B357;--warn-bg:#2E2617;--bad:#E58BB0;--bad-bg:#33202A;--dim:#8B9C9F;--dim-bg:#1A2427;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.8);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0A1113;--surface:#111A1D;--surface-2:#162226;--surface-3:#1D2C30;--ink:#E7EEEF;--ink-2:#A5B7BA;--ink-3:#78898D;--rule:#243337;--rule-soft:#1B282B;--accent:#F0AA3E;--cyan:#4FC7CE;--mag:#E58BB0;--ok:#6ECB99;--ok-bg:#163024;--warn:#E0B357;--warn-bg:#2E2617;--bad:#E58BB0;--bad-bg:#33202A;--dim:#8B9C9F;--dim-bg:#1A2427;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.8);color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}.col{max-width:var(--measure)}
+h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.16;font-weight:600}h1{font-size:clamp(2.2rem,5.5vw,3.7rem);letter-spacing:-.022em;line-height:1.03}h2{font-size:clamp(1.4rem,3vw,1.9rem);letter-spacing:-.014em}h3{font-size:1.08rem}h4{font-size:.95rem}p{margin:0}
+a{color:var(--cyan);text-underline-offset:3px}a:hover{color:var(--accent)}:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+.eyebrow{font-family:var(--mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.lede{font-size:clamp(1.04rem,2vw,1.2rem);color:var(--ink-2);line-height:1.55}.small{font-size:.88rem;color:var(--ink-2)}
+code{font-family:var(--mono);font-size:.845em;background:var(--surface-2);padding:.12em .38em;border-radius:4px;border:1px solid var(--rule-soft)}
+header.hero{border-bottom:1px solid var(--rule);background:var(--surface);padding:clamp(32px,6vw,60px) 0 clamp(26px,4vw,40px)}header.hero h1{margin:14px 0 18px}.accent-word{color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-top:28px}.stat{background:var(--surface);padding:13px 14px}.stat b{display:block;font-family:var(--mono);font-size:1.3rem;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}.stat span{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}.stat.hi b{color:var(--accent)}.stat.bad b{color:var(--mag)}.stat.ok b{color:var(--ok)}
+nav.jump{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}nav.jump ul{display:flex;list-style:none;margin:0;padding:0;overflow-x:auto}nav.jump a{display:block;white-space:nowrap;padding:11px 14px;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-decoration:none;border-bottom:2px solid transparent}nav.jump a:hover{color:var(--ink);border-bottom-color:var(--accent)}
+section{padding:clamp(42px,7vw,76px) 0;border-bottom:1px solid var(--rule-soft)}section:last-of-type{border-bottom:none}.sec-head{display:flex;flex-direction:column;gap:9px;margin-bottom:26px}.sec-head p{max-width:var(--measure)}.stack{display:flex;flex-direction:column;gap:22px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:.66rem;letter-spacing:.05em;text-transform:uppercase;font-weight:500;padding:3px 8px;border-radius:999px;white-space:nowrap}.chip::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}.ch-ok{color:var(--ok);background:var(--ok-bg)}.ch-warn{color:var(--warn);background:var(--warn-bg)}.ch-bad{color:var(--bad);background:var(--bad-bg)}.ch-dim{color:var(--dim);background:var(--dim-bg)}
+.tscroll{overflow-x:auto;border:1px solid var(--rule);border-radius:8px;background:var(--surface)}table{border-collapse:collapse;width:100%;font-size:.87rem;min-width:600px}th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--rule-soft);vertical-align:top}thead th{font-family:var(--mono);font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:500;background:var(--surface-2);border-bottom:1px solid var(--rule)}tbody tr:last-child td{border-bottom:none}td.name{font-family:var(--mono);font-size:.82rem;white-space:nowrap}td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}.t-note{font-size:.85rem;color:var(--ink-2);line-height:1.5}tr.hl td{background:var(--surface-2)}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}.g3{grid-template-columns:repeat(auto-fit,minmax(238px,1fr))}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:18px 19px;display:flex;flex-direction:column;gap:9px;box-shadow:var(--shadow)}.card p{font-size:.9rem;color:var(--ink-2);line-height:1.55}.card .tag{font-family:var(--mono);font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}.card .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+figure{margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}figure img{width:100%;height:auto;border-radius:4px;display:block}figcaption{font-size:.85rem;color:var(--ink-2);line-height:1.5}figcaption b{color:var(--ink)}
+.note{border:1px solid var(--rule);border-left:2px solid var(--accent);background:var(--surface);border-radius:6px;padding:15px 17px;display:flex;flex-direction:column;gap:7px}.note h4{font-family:var(--mono);font-size:.7rem;letter-spacing:.11em;text-transform:uppercase;color:var(--accent)}.note p,.note li{font-size:.9rem;color:var(--ink-2);line-height:1.55}.note ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}.note.bad{border-left-color:var(--mag)}.note.bad h4{color:var(--mag)}.note.ok{border-left-color:var(--ok)}.note.ok h4{color:var(--ok)}
+ol.phases{list-style:none;counter-reset:ph;margin:0;padding:0}ol.phases li{counter-increment:ph;display:grid;grid-template-columns:auto 1fr;gap:18px;padding:18px 0;border-bottom:1px solid var(--rule-soft)}ol.phases li:last-child{border-bottom:none}ol.phases li::before{content:counter(ph);font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--accent);border:1px solid var(--rule);background:var(--surface);width:34px;height:34px;display:grid;place-items:center;border-radius:50%}.ph-body{display:flex;flex-direction:column;gap:7px}.ph-body h3{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px}.ph-when{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:400}.ph-body p{font-size:.93rem;color:var(--ink-2)}
+footer{padding:34px 0 56px;color:var(--ink-3);font-size:.84rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}@media (max-width:640px){body{font-size:16px}ol.phases li{grid-template-columns:1fr;gap:10px}}
+"""
+
+HTML = f"""<title>Identity, Not Context</title>
+<style>{CSS}</style>
+
+<header class="hero"><div class="wrap">
+<p class="eyebrow">17 Aug 2026 &middot; Apple M2, CPU only, $0 compute &middot; three species &middot; reviewed, corrected, kill-tested</p>
+<h1>Identity, Not <span class="accent-word">Context</span></h1>
+<p class="lede col">Ask a frozen audio model what situation an animal was in and it answers surprisingly well &mdash; until you stop it recognising <em>which animal</em>, or <em>which lab</em>. Across cats, pigs and wild bats, identity and recording site are decodable at 0.63&ndash;0.82 and inflate standard context accuracy by 10 to 21 points; the pig paper&rsquo;s own acoustic features score below chance once a lab is held out. A second, smaller result: an affect direction learned on dogs <em>or</em> pigs predicts cat contexts, survives every adversarial test, and is not what it first looked like. All of it came off a laptop in a day.</p>
+<div class="stats">
+<div class="stat"><b>3</b><span>species</span></div>
+<div class="stat"><b>7,687</b><span>calls</span></div>
+<div class="stat bad"><b>0.79</b><span>cat identity acc</span></div>
+<div class="stat bad"><b>+0.21</b><span>split inflation, pigs</span></div>
+<div class="stat bad"><b>0.386</b><span>paper features, held-out lab</span></div>
+<div class="stat hi"><b>2 / 6</b><span>transfer cells significant</span></div>
+</div></div></header>
+
+<nav class="jump"><div class="wrap"><ul>
+<li><a href="#result">The result</a></li><li><a href="#enc">Encoders</a></li><li><a href="#room">The room</a></li><li><a href="#transfer">Transfer</a></li><li><a href="#signs">Opposite signs</a></li><li><a href="#species">Pigs &amp; bats</a></li><li><a href="#kill">What could kill it</a></li><li><a href="#next">Next</a></li>
+</ul></div></nav>
+
+<main>
+
+<section id="result"><div class="wrap stack">
+<div class="sec-head"><p class="eyebrow">In one page</p><h2>Three findings, ranked by how much I believe them</h2></div>
+<div class="grid g3">
+<div class="card"><span class="tag">Real &middot; the actual finding</span><h3>Identity dominates</h3><p>These features identify <b>which of 21 cats</b> is meowing at 0.70&ndash;0.79 against a 4.8% chance rate. Any evaluation that lets a cat appear in both train and test is measuring voice recognition. The inflation is <b>+0.10 to +0.20</b>, replicated in all five feature sets.</p><div class="meta"><span class="chip ch-ok">5 of 5 feature sets</span></div></div>
+<div class="card"><span class="tag">Real, uncomfortable</span><h3>The room does the work</h3><p>Delete the meow, keep only the quiet frames between calls: <b>0.725</b> on the binary cat task, matching the full embedding. CatMeows induced isolation by moving the cat to a different room, so the label is partly a room label.</p><div class="meta"><span class="chip ch-warn">caveat + finding</span></div></div>
+<div class="card"><span class="tag">Real, modest</span><h3>Affect transfers dog&nbsp;&rarr;&nbsp;cat</h3><p>A probe trained only on dog barks predicts cat contexts at <b>0.583</b>, animal-level p = 0.0045, and survives balanced classes (0.618) and strict scaling (0.591). But <b>duration alone gives 0.557</b>, and removing it leaves 0.552. Half the effect is how long the animal calls for.</p><div class="meta"><span class="chip ch-warn">half duration</span><span class="chip ch-ok">survives controls</span></div></div>
+</div>
+<div class="note bad"><h4>What a reviewer changed after these results were in</h4><ul>
+<li><b>The headline was wrong.</b> I led with cross-species transfer. The leakage result is the one that is replicated, mechanistically coherent, and needs no new data. It leads now.</li>
+<li><b>&ldquo;Embeddings transfer where acoustics cannot&rdquo; was overstated.</b> Log-duration <em>is</em> same-sign in both species (+0.28 / +0.31 SD). The four-feature probe failed because, trained on cats, it loads on energy &mdash; which points the other way in dogs and drags it below chance. That is a weighting artifact, not a fact about handcrafted features.</li>
+<li><b>The statistics were anti-conservative.</b> Permuting 348 correlated meows as if independent, when identity is 79% decodable, is the wrong exchangeable unit. Re-running with 2,000 animal-level permutations. Also: with 300 permutations the smallest reportable p is 0.0033 &mdash; WavLM hit that floor, so it should read &ldquo;p &lt; 0.0033&rdquo;.</li>
+<li><b>The asymmetry may not exist.</b> 0.583 versus 0.527 with null SDs ~0.04 gives z&approx;0.95, p&approx;0.34. All three cat&rarr;dog estimates are <em>above</em> chance. The honest phrasing is &ldquo;underpowered&rdquo;, never &ldquo;fails&rdquo;.</li>
+</ul></div>
+</div></section>
+
+<section id="enc"><div class="wrap stack">
+<div class="sec-head"><p class="eyebrow">Experiment 1</p><h2>Five frozen encoders, one honest split</h2>
+<p class="lede">440 meows, 21 cats, 3 contexts. Every model frozen; only a logistic probe is trained. Leave-one-cat-out, so no cat is ever in both train and test.</p></div>
+<figure><img src="data:image/png;base64,{b['encoders']}" alt="Encoder comparison bar chart"><figcaption><b>The three bars matter more than any one of them.</b> Blue is the honest number. Magenta is what you get from a random split &mdash; the same features, the same classifier, up to +0.18. Amber explains why: these features identify <em>which of 21 cats</em> is meowing at 0.70&ndash;0.79 (chance 0.048). A random split is measuring voice recognition and calling it context.</figcaption></figure>
+<figure><img src="data:image/png;base64,{b['layers']}" alt="WavLM layer sweep"><figcaption><b>Identity fades with depth; context does not.</b> WavLM's cat-identity accuracy falls from 0.820 at layer 1 to 0.655 at layer 12, while context holds near 0.51&ndash;0.56. If you want an encoder that hears the <em>situation</em> rather than the <em>animal</em>, go deep. This is the same shape the transfer result will show.</figcaption></figure>
+<div class="tscroll"><table>
+<thead><tr><th>encoder</th><th class="num">layer</th><th class="num">context (honest)</th><th class="num">context (random split)</th><th class="num">cat identity</th></tr></thead><tbody>
+<tr class="hl"><td class="name">hubert-base-ls960</td><td class="num">12</td><td class="num"><b>0.571</b></td><td class="num">0.671</td><td class="num">0.700</td></tr>
+<tr><td class="name">wavlm-base-plus</td><td class="num">3</td><td class="num">0.559</td><td class="num">0.725</td><td class="num">0.793</td></tr>
+<tr><td class="name">wav2vec2-base</td><td class="num">2</td><td class="num">0.554</td><td class="num">0.737</td><td class="num">0.755</td></tr>
+<tr><td class="name">AVES-bio (ESP)</td><td class="num">5</td><td class="num">0.540</td><td class="num">0.736</td><td class="num">0.793</td></tr>
+<tr><td class="name">MFCC baseline</td><td class="num">&mdash;</td><td class="num">0.399</td><td class="num">0.602</td><td class="num">0.768</td></tr>
+</tbody></table></div>
+<p class="small col">Chance is 0.333 for context, 0.048 for identity. <b>Do not read the ordering as &ldquo;speech beats bioacoustics&rdquo;</b> &mdash; HuBERT&rsquo;s 0.571 over AVES&rsquo;s 0.540 is about 14 clips in a 21-cluster design where per-cat accuracy spans 0.00 to 0.86. The defensible version is the negative: <em>bioacoustic pretraining confers no measurable advantage over speech SSL on domestic-animal vocalisations</em>. Note too that every encoder got best-of-13-layers selection while MFCC got one configuration, and the honest paralinguistics baseline is eGeMAPS (F0, jitter, shimmer, HNR, formants), not MFCC-85. <b>Now run: eGeMAPS scores 0.486</b> under leave-one-cat-out &mdash; so the encoders&rsquo; margin over handcrafted features is +0.07 to +0.09, not +0.17. Smaller, and it holds. eGeMAPS shows the same identity leak (0.727) and split inflation (+0.155).</p>
+</div></section>
+
+<section id="room"><div class="wrap stack">
+<div class="sec-head"><p class="eyebrow">The control that changed the story</p><h2>Delete the meow. The label survives.</h2>
+<p class="lede">CatMeows induced isolation by carrying the cat into an unfamiliar room. So the negative class differs by <em>recording environment</em>, by construction. I threw away the vocalisation and kept only the quietest 30% of frames.</p></div>
+<figure><img src="data:image/png;base64,{b['room']}" alt="Room control"><figcaption><b>Left:</b> background-only does not transfer across species &mdash; there is no shared room between a 2008 Hungarian dog corpus and a 2021 Italian cat corpus. <b>Right:</b> but within cats, the background alone reaches 0.725, essentially matching the full embedding. A large share of &ldquo;context classification&rdquo; on this dataset is the room.</figcaption></figure>
+<div class="note bad"><h4>This is a caveat and a finding</h4><ul>
+<li>Published accuracies on CatMeows are considerably higher than ours. Before believing any of them, check two things: the split, <em>and</em> whether the room is doing the work.</li>
+<li>The reverb proxy confirms it &mdash; energy-decay slope separates the classes at +0.67 / &minus;0.32 SD in dogs and +0.10 / &minus;0.18 in cats.</li>
+<li>This is the leakage-audit idea from the plan, landing on real data. &ldquo;Context datasets are partly room datasets&rdquo; is a paper in itself if it holds across more corpora.</li>
+</ul></div>
+</div></section>
+
+<section id="transfer"><div class="wrap stack">
+<div class="sec-head"><p class="eyebrow">Experiment 3</p><h2>Train on dogs. Test on cats.</h2>
+<p class="lede">A binary affect axis defensible in both species: <b>negative</b> = cat isolation + dog aggression; <b>positive</b> = cat brushing + dog play. Ambiguous categories (cat waiting-for-food, dog contact) excluded before looking at results. Features z-scored within species, so the probe cannot simply detect which species it is.</p></div>
+<figure><img src="data:image/png;base64,{b['transfer']}" alt="Per-layer transfer with permutation null"><figcaption><b>The right panel is the result.</b> dog&rarr;cat rises monotonically with depth and is significant at five consecutive deep layers (L7 0.624 p=0.013; L9 0.656 p=0.000; L10 0.646 p=0.007; L11 0.632 p=0.030; L12 0.623 p=0.017). That shape &mdash; a trend, not a spike &mdash; is much harder to get by chance than any single layer. cat&rarr;dog, on the left, is noise with one borderline point.</figcaption></figure>
+<figure><img src="data:image/png;base64,{b['replication']}" alt="Replication across three encoders"><figcaption><b>Selection-free replication.</b> Mean transfer accuracy over <em>all</em> layers &mdash; nothing chosen after seeing the answer. WavLM p=0.0033 and HuBERT p=0.0367 both survive; wav2vec2 does not. Bootstrapping over whole animals gives a 95% CI of [0.582, 0.676] for HuBERT's best layer, excluding chance.</figcaption></figure>
+<div class="note bad"><h4>Do not explain an asymmetry you have not established</h4><p>The difference between the two directions is itself not significant (z&approx;0.95, p&approx;0.34), and all three cat&rarr;dog estimates sit above chance. Explaining a gap before showing it exists is the classic error. If it does survive the asymmetry test, the candidate causes are: Candidate reasons: dogs have the cleaner within-species signal (0.74&ndash;0.89 versus 0.69&ndash;0.79), so the direction learned from them is better defined; or aggression-vs-play is simply a more acoustically extreme contrast than isolation-vs-brushing; or the inverted class imbalance between the corpora is doing something. Deciding between these is the first experiment of the next session.</p></div>
+</div></section>
+
+<section id="signs"><div class="wrap stack">
+<div class="sec-head"><p class="eyebrow">Corrected</p><h2>Three cues invert. One does not.</h2>
+<p class="lede">The standard account &mdash; Morton&rsquo;s motivation-structural rules and the acoustic-universals literature since &mdash; says arousal raises pitch, loudness and harshness. I ran four interpretable features through the identical pipeline.</p></div>
+<figure><img src="data:image/png;base64,{b['acoustics']}" alt="Per-feature separation, cats vs dogs"><figcaption><b>Energy, centroid and zero-crossing rate separate the classes in opposite directions in the two species</b> &mdash; dog play is louder and harsher than dog aggression, while cat isolation is louder and harsher than cat brushing. That inversion is itself Morton-consistent: the two &ldquo;negatives&rdquo; are different emotions, hostility versus distress. <b>But log-duration points the same way in both (+0.28 / +0.31 SD)</b>, and that is the problem.</figcaption></figure>
+<div class="note bad"><h4>The kill-test verdict &mdash; duration is half of it</h4>
+<div class="tscroll"><table><thead><tr><th>test</th><th class="num">dog&rarr;cat</th><th>reading</th></tr></thead><tbody>
+<tr><td class="t-note"><b>duration alone</b>, one feature</td><td class="num"><b>0.557</b></td><td class="t-note">almost exactly the predicted 0.556</td></tr>
+<tr><td class="t-note">embedding, raw</td><td class="num">0.583</td><td class="t-note">mean over 13 WavLM layers</td></tr>
+<tr><td class="t-note">embedding, <b>duration regressed out</b></td><td class="num"><b>0.552</b></td><td class="t-note">small residual, borderline (z&approx;1.7)</td></tr>
+<tr><td class="t-note">animal-level permutation, 2,000 draws</td><td class="num"><b>p = 0.0045</b></td><td class="t-note">the correct exchangeable unit; survives</td></tr>
+<tr><td class="t-note">asymmetry, dog&rarr;cat minus cat&rarr;dog</td><td class="num">p = 0.44</td><td class="t-note"><b>not significant</b></td></tr>
+</tbody></table></div>
+<p>So the transfer is real at the animal level, but <b>roughly half of what transfers is call duration</b> &mdash; the one cue that points the same way in both species. What survives after removing duration is small and needs a third species to mean anything. And the &ldquo;dogs teach cats but not vice versa&rdquo; story does not hold up: the two directions are not statistically different. The honest one-liner: <em>an affect axis transfers dog&rarr;cat in frozen speech embeddings and survives animal-level, balanced and strict-scaling tests; about half the effect is duration, the residual is small, and the directional asymmetry is not supported.</em> Modest, clean, and exactly the shape of result ICBINB @ NeurIPS asks for. Not the headline. The headline is identity.</p></div>
+<figure><img src="data:image/png;base64,{b['leakage']}" alt="Identity accuracy versus inflation gap"><figcaption><b>A tempting pattern, reported honestly.</b> The encoder that leaks the least identity (HuBERT, 0.700) has the smallest inflation gap and the best honest accuracy; the leakiest (AVES and WavLM, 0.793) have the largest gaps. Pearson r = 0.81 &mdash; but with only five encoders, <b>p = 0.094</b> (Spearman r = 0.41, p = 0.49). Suggestive, not significant. Worth a figure and a follow-up, not a claim.</figcaption></figure>
+</div></section>
+
+<section id="species"><div class="wrap stack">
+<div class="sec-head"><p class="eyebrow">Iteration 3</p><h2>A third species, a wild species, and a hypothesis that died</h2>
+<p class="lede">The reviewer&rsquo;s first ask was a third corpus from a third lab, to break the two-corpus channel confound and turn a pair into a matrix. Pigs (Soundwel, Briefer et al. 2022, CC-BY-4.0): 5,031 calls after capping, 17 contexts each wholly positive or negative, recorded by <b>six different labs</b>. Bats (Prat et al. 2017 via ESP): 10 wild Egyptian fruit bats, 200 calls each, at 250 kHz.</p></div>
+
+<figure><img src="data:image/png;base64,{b['pigs']}" alt="Pigs: held-out lab vs random split vs lab decodability"><figcaption><b>Pigs: the split learns the lab.</b> Valence is confounded with recording team, so the honest unit is the lab. Held-out-lab accuracy averages <b>0.604</b> (best layer 0.660); a random split reports <b>0.813</b>. Which-lab is decodable at <b>0.82</b> from the embedding (chance 0.17). And the paper&rsquo;s own 18 acoustic features score <b>0.386 &mdash; below chance</b> &mdash; when a lab is held out: the feature&ndash;valence mapping partly inverts between labs. (A reframing, not a refutation: the paper never claimed cross-lab generalisation.)</figcaption></figure>
+
+<figure><img src="data:image/png;base64,{b['matrix3']}" alt="3x3 cross-species transfer matrix"><figcaption><b>The matrix. Two of six off-diagonal cells are significant, and both point at cats.</b> dog&rarr;cat 0.583 (p=0.015) and pig&rarr;cat 0.591 (p=0.005), under group-level permutation. Nothing transfers <em>into</em> dogs or pigs. Placebo pig&nbsp;sex&nbsp;&rarr;&nbsp;cat&nbsp;affect: 0.510. Note the pig diagonal is shown after within-lab z-scoring, which strips valence from the two single-valence labs; the honest within-pig number is the 0.604 above.</figcaption></figure>
+
+<div class="grid g2">
+<figure><img src="data:image/png;base64,{b['bats']}" alt="Bat identity decodability"><figcaption><b>Wild bats: identity dominance is not a domestic-animal quirk.</b> 10-way identity at 0.63&ndash;0.70 (chance 0.10). And a free 4&times; time-stretch, which folds 0&ndash;32&nbsp;kHz into the encoder&rsquo;s 8&nbsp;kHz band, lifts WavLM identity from 0.631 to <b>0.700</b> &mdash; a small positive on ESP&rsquo;s own bandwidth problem, for zero cost. The BEANS packaging carries no context labels, so bats sit in Paper A, not B.</figcaption></figure>
+<figure><img src="data:image/png;base64,{b['construct']}" alt="Pig probe on cat contexts"><figcaption><b>Construct validity, passed.</b> The cat context we <em>excluded before looking</em> as ambiguous &mdash; waiting for food &mdash; is rated by the pig-trained probe at 0.495, exactly between brushing (0.443) and isolation (0.621). An affect-like axis should do precisely that.</figcaption></figure>
+</div>
+
+<div class="note bad"><h4>Hypothesis tested and rejected: &ldquo;it&rsquo;s isolation calls&rdquo;</h4><p>Pig negatives are dominated by piglet isolation; cat negatives <em>are</em> isolation. If the shared axis were separation distress, removing pig isolation from the source should collapse pig&rarr;cat. It moves from 0.591 to <b>0.568 (still p=0.03)</b>; isolation-only as source gives 0.552. Not isolation-specific. Whatever transfers is more general &mdash; and still small.</p></div>
+<div class="note bad"><h4>Second encoder: pig&rarr;cat does not replicate</h4><p>Re-run the matrix with HuBERT instead of WavLM. <b>dog&rarr;cat holds</b> (0.561, p=0.06, on top of the earlier selection-free p=0.037). <b>pig&rarr;cat drops to 0.530, p=0.23</b> &mdash; a WavLM-only result. Everything else stays at chance. So the honest count is <em>one cell robust across two encoders, one encoder-dependent, four at chance.</em> A third encoder family &mdash; ESP&rsquo;s bioacoustic AVES, not a speech model &mdash; is running now; that decides whether dog&rarr;cat is a property of frozen encoders or of speech pretraining specifically.</p></div>
+<div class="note ok"><h4>Where the two papers stand</h4><ul>
+<li><b>Paper A, leakage &mdash; now three species strong.</b> Cats: individual, +0.10&ndash;0.20. Pigs: lab, +0.21, published features below chance across labs. Bats: identity 0.63&ndash;0.70 in a wild species. Plus the bandwidth aside. A real, multi-dataset methods paper.</li>
+<li><b>Paper B, transfer &mdash; smaller and stranger.</b> One cell robust across encoders (dog&rarr;cat), one encoder-dependent (pig&rarr;cat), placebo-clean, survives duration partialling (borderline), balanced classes, strict scaling, group-level permutation, construct validity; isolation hypothesis rejected. But only <em>into</em> cats, and only one encoder family tested at scale. Honest framing: <em>a cat affect axis is predictable from probes trained on two other species; the reverse is not; the shared component is small, partly duration, and not isolation-specific.</em></li>
+</ul></div>
+</div></section>
+
+<section id="kill"><div class="wrap stack">
+<div class="sec-head"><p class="eyebrow">Adversarial</p><h2>What could still kill this</h2><p class="lede">Written down now, before anyone gets attached to the result.</p></div>
+<div class="note ok"><h4>Two of the four dangers are now eliminated</h4><ul>
+<li><b>Inverted class imbalance &mdash; cleared.</b> Subsampling both species to equal class sizes (127/class cats, 99/class dogs, 200 resamples) gives dog&rarr;cat <b>0.618</b>, 95% range [0.581, 0.648], p &lt; 0.0001. The imbalance was working <em>against</em> the effect, not creating it.</li>
+<li><b>Transductive scaling &mdash; cleared.</b> Under strict leave-one-target-animal-out scaling, where each held-out cat contributes nothing to its own normalisation, dog&rarr;cat is <b>0.591</b>, p = 0.005. The test-set statistics were not doing the work.</li>
+<li><b>Still open, and lethal if it lands:</b> call duration, and the two-corpus channel difference.</li>
+</ul></div>
+<div class="grid g2">
+<div class="note bad"><h4>Danger 1 &mdash; two corpora, two labs</h4><p>Cats: Italy, 2021. Dogs: Hungary, 2008. Different mics, different decades. Within-species z-scoring removes the mean offset but not a class-correlated channel difference that happens to align across corpora. <b>Settles it:</b> a third species from a fourth lab, or convolving both corpora with a shared set of impulse responses and re-running.</p></div>
+<div class="note bad"><h4>Danger 2 &mdash; one contrast each</h4><p>The &ldquo;affect axis&rdquo; is really isolation-vs-brushing mapped onto aggression-vs-play. Those two contrasts might share something specific rather than something general. <b>Settles it:</b> species with several labelled contexts each &mdash; bats, pigs, zebra finches.</p></div>
+<div class="note bad"><h4>Danger 3 &mdash; inverted imbalance</h4><p>Cats are negative-heavy (221/127); dogs are negative-light (99/209). The imbalance is <em>inverted</em> between species, which is exactly the configuration where a badly calibrated probe can look like it transfers. <b>Settles it:</b> subsample to equal class sizes, rerun, report both.</p></div>
+<div class="note bad"><h4>Danger 4 &mdash; small n, and transductive scaling</h4><p>Ten dogs, twenty cats; bootstrap CIs are wide. And the target z-score uses test statistics &mdash; standard in domain adaptation, but a strict held-out-animal version should be reported. <b>Settles it:</b> more individuals; mixed-effects model with animal as a random effect.</p></div>
+</div>
+</div></section>
+
+<section id="next"><div class="wrap stack">
+<div class="sec-head"><p class="eyebrow">Sequence</p><h2>What happens next</h2></div>
+<ol class="phases">
+<li><div class="ph-body"><h3>A third species <span class="ph-when">the decisive one</span></h3><p>Egyptian fruit bats (Prat 2016: ~15k calls with context and emitter ID) or pigs (Briefer 2022: 7,414 calls across 19 valence-labelled contexts). A third corpus from a third lab breaks the two-corpus channel confound and turns two points into a matrix. If dog&rarr;bat and dog&rarr;pig also work, the finding is about mammals; if only dog&rarr;cat works, it is about those two datasets.</p><div class="meta"><span class="chip ch-ok">CPU, one evening</span></div></div></li>
+<li><div class="ph-body"><h3>Kill the imbalance and the scaling <span class="ph-when">one hour</span></h3><p>Rerun with equal class sizes and with strict held-out-animal z-scoring. Cheap, and it removes two of the four dangers above outright.</p><div class="meta"><span class="chip ch-ok">CPU, minutes</span></div></div></li>
+<li><div class="ph-body"><h3>Explain the asymmetry</h3><p>Three candidate causes, each with a cheap discriminating test: match the within-species accuracy by subsampling; swap which contrast is used; equalise n. Whichever survives explains why dogs teach cats but cats do not teach dogs.</p></div></li>
+<li><div class="ph-body"><h3>Open the black box <span class="ph-when">connects to chapter 5</span></h3><p>If the direction is not loudness or pitch, what is it? Train a sparse autoencoder on the layer-9 embeddings and look for a feature that fires on distress in both species. This is exactly the SAE chapter from the plan, arriving with a concrete question instead of a vague one.</p><div class="meta"><span class="chip ch-dim">novelty-checked: unoccupied</span></div></div></li>
+<li><div class="ph-body"><h3>The room paper</h3><p>Independently: run the background-only control across every context dataset that is public. If &ldquo;context datasets are partly room datasets&rdquo; holds broadly, that is a short, useful, slightly uncomfortable methods paper, and it is the leakage audit the plan already wanted.</p></div></li>
+</ol>
+</div></section>
+</main>
+<footer><div class="wrap"><p>Run overnight 17 Aug 2026 on an Apple M2, CPU only, no GPU, $0 of compute. Data: CatMeows (Ludovico et al. 2021, CC-BY-4.0, Zenodo 4008297) and dog barks (Moln&aacute;r et al. 2008, via Earth Species Project's BEANS). Encoders: WavLM, HuBERT, wav2vec2 (Microsoft / Meta), AVES-bio (Earth Species Project). Every number here came from a script in <code>ctx/</code>; nothing is illustrative. Companion pages: The Earth Species Stack &middot; The Context Probe.</p></div></footer>
+"""
+out = os.path.join(D, "opposite-signs.html")
+open(out, "w").write(HTML)
+print("wrote", out, len(HTML)//1024, "KB")

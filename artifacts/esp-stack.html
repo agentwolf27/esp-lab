@@ -1,0 +1,999 @@
+<title>The Earth Species Stack</title>
+
+<style>
+  /* ---------- tokens: complete light palette on bare :root ---------- */
+  :root{
+    --bg:#EFF2F3;
+    --surface:#FBFCFC;
+    --surface-2:#E4EAEB;
+    --surface-3:#DAE2E3;
+    --ink:#0F1A1C;
+    --ink-2:#42565A;
+    --ink-3:#6C8084;
+    --rule:#CBD6D8;
+    --rule-soft:#DDE5E6;
+    --accent:#9A5205;
+    --accent-bright:#C87A12;
+    --cyan:#0A626D;
+    --ok:#2C6349;
+    --ok-bg:#DCEBE3;
+    --warn:#7E5A0C;
+    --warn-bg:#F0E7D0;
+    --gpu:#8A3459;
+    --gpu-bg:#F2DEE7;
+    --dim:#5C6E71;
+    --dim-bg:#E1E7E8;
+    --shadow:0 1px 2px rgba(15,26,28,.06), 0 8px 24px -16px rgba(15,26,28,.28);
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,"Cascadia Mono","Roboto Mono",monospace;
+    --serif:Charter,"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    --measure:68ch;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0A1113;
+      --surface:#111A1D;
+      --surface-2:#162226;
+      --surface-3:#1D2C30;
+      --ink:#E7EEEF;
+      --ink-2:#A5B7BA;
+      --ink-3:#78898D;
+      --rule:#243337;
+      --rule-soft:#1B282B;
+      --accent:#F0AA3E;
+      --accent-bright:#FFC463;
+      --cyan:#4FC7CE;
+      --ok:#6ECB99;
+      --ok-bg:#163024;
+      --warn:#E0B357;
+      --warn-bg:#2E2617;
+      --gpu:#E58BB0;
+      --gpu-bg:#33202A;
+      --dim:#8B9C9F;
+      --dim-bg:#1A2427;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0A1113;
+    --surface:#111A1D;
+    --surface-2:#162226;
+    --surface-3:#1D2C30;
+    --ink:#E7EEEF;
+    --ink-2:#A5B7BA;
+    --ink-3:#78898D;
+    --rule:#243337;
+    --rule-soft:#1B282B;
+    --accent:#F0AA3E;
+    --accent-bright:#FFC463;
+    --cyan:#4FC7CE;
+    --ok:#6ECB99;
+    --ok-bg:#163024;
+    --warn:#E0B357;
+    --warn-bg:#2E2617;
+    --gpu:#E58BB0;
+    --gpu-bg:#33202A;
+    --dim:#8B9C9F;
+    --dim-bg:#1A2427;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    color-scheme:dark;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--serif);
+    font-size:17px;
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+  .col{max-width:var(--measure)}
+
+  /* ---------- type ---------- */
+  h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.16;font-weight:600}
+  h1{font-size:clamp(2.4rem,6vw,4.1rem);letter-spacing:-.022em;line-height:1.02}
+  h2{font-size:clamp(1.5rem,3vw,2.05rem);letter-spacing:-.014em}
+  h3{font-size:1.12rem;letter-spacing:-.006em}
+  h4{font-size:.95rem}
+  p{margin:0}
+  a{color:var(--cyan);text-underline-offset:3px;text-decoration-thickness:1px}
+  a:hover{color:var(--accent)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+
+  .eyebrow{
+    font-family:var(--mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:500;
+  }
+  .lede{font-size:clamp(1.06rem,2vw,1.24rem);color:var(--ink-2);line-height:1.55}
+  .small{font-size:.9rem;color:var(--ink-2)}
+  .mono{font-family:var(--mono)}
+  code{
+    font-family:var(--mono);font-size:.845em;background:var(--surface-2);
+    padding:.12em .38em;border-radius:4px;color:var(--ink);
+    border:1px solid var(--rule-soft);
+  }
+  pre{
+    font-family:var(--mono);font-size:.8rem;line-height:1.7;
+    background:var(--surface);border:1px solid var(--rule);border-left:2px solid var(--accent);
+    padding:14px 16px;border-radius:6px;overflow-x:auto;margin:0;color:var(--ink);
+  }
+  pre code{background:none;border:none;padding:0;font-size:inherit}
+  .c-dim{color:var(--ink-3)}
+
+  /* ---------- header ---------- */
+  header.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--rule);background:var(--surface)}
+  #spec{display:block;width:100%;height:210px;opacity:.9}
+  .hero-mask{position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(to bottom,transparent 0%,transparent 34%,var(--surface) 96%)}
+  .hero-body{position:relative;padding:clamp(28px,5vw,52px) 0 clamp(30px,4vw,44px);margin-top:-58px}
+  .hero-body h1{margin:14px 0 18px}
+  .accent-word{color:var(--accent)}
+
+  .stats{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));
+    gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;
+    overflow:hidden;margin-top:30px;
+  }
+  .stat{background:var(--surface);padding:13px 14px}
+  .stat b{display:block;font-family:var(--mono);font-size:1.36rem;font-weight:600;
+    letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .stat span{font-family:var(--mono);font-size:.63rem;letter-spacing:.11em;
+    text-transform:uppercase;color:var(--ink-3)}
+
+  /* ---------- nav ---------- */
+  nav.jump{
+    position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--rule);
+  }
+  nav.jump ul{display:flex;gap:0;list-style:none;margin:0;padding:0;overflow-x:auto;scrollbar-width:thin}
+  nav.jump a{
+    display:block;white-space:nowrap;padding:11px 14px;font-family:var(--mono);
+    font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
+    text-decoration:none;border-bottom:2px solid transparent;
+  }
+  nav.jump a:hover{color:var(--ink);border-bottom-color:var(--accent)}
+
+  /* ---------- sections ---------- */
+  section{padding:clamp(46px,7vw,84px) 0;border-bottom:1px solid var(--rule-soft)}
+  section:last-of-type{border-bottom:none}
+  .sec-head{display:flex;flex-direction:column;gap:9px;margin-bottom:30px}
+  .sec-head p{max-width:var(--measure)}
+  .stack{display:flex;flex-direction:column;gap:22px}
+
+  /* ---------- chips ---------- */
+  .chip{
+    display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);
+    font-size:.66rem;letter-spacing:.05em;text-transform:uppercase;font-weight:500;
+    padding:3px 8px;border-radius:999px;white-space:nowrap;
+  }
+  .chip::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
+  .ch-ok{color:var(--ok);background:var(--ok-bg)}
+  .ch-warn{color:var(--warn);background:var(--warn-bg)}
+  .ch-gpu{color:var(--gpu);background:var(--gpu-bg)}
+  .ch-dim{color:var(--dim);background:var(--dim-bg)}
+
+  /* ---------- tables ---------- */
+  .tscroll{overflow-x:auto;border:1px solid var(--rule);border-radius:8px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;font-size:.87rem;min-width:660px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+  thead th{
+    font-family:var(--mono);font-size:.64rem;letter-spacing:.11em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:500;background:var(--surface-2);
+    border-bottom:1px solid var(--rule);position:sticky;top:0;
+  }
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:var(--surface-2)}
+  td.name{font-family:var(--mono);font-size:.82rem;white-space:nowrap}
+  td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink-2)}
+  .t-note{font-size:.85rem;color:var(--ink-2);line-height:1.5}
+
+  /* ---------- filters ---------- */
+  .filters{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;align-items:center}
+  .filters .lbl{font-family:var(--mono);font-size:.64rem;letter-spacing:.11em;
+    text-transform:uppercase;color:var(--ink-3);margin-right:3px}
+  button.f{
+    font-family:var(--mono);font-size:.7rem;letter-spacing:.04em;padding:5px 11px;
+    background:var(--surface);color:var(--ink-2);border:1px solid var(--rule);
+    border-radius:999px;cursor:pointer;transition:background .12s,color .12s,border-color .12s;
+  }
+  button.f:hover{border-color:var(--ink-3);color:var(--ink)}
+  button.f[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .count{font-family:var(--mono);font-size:.7rem;color:var(--ink-3);margin-left:auto;
+    font-variant-numeric:tabular-nums}
+
+  /* ---------- cards ---------- */
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(238px,1fr))}
+  .card{
+    background:var(--surface);border:1px solid var(--rule);border-radius:8px;
+    padding:18px 19px;display:flex;flex-direction:column;gap:9px;box-shadow:var(--shadow);
+  }
+  .card h3{font-family:var(--serif)}
+  .card .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+  .card p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+  .card .tag{font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--accent)}
+
+  /* ---------- phases ---------- */
+  ol.phases{list-style:none;counter-reset:ph;margin:0;padding:0;
+    display:flex;flex-direction:column;gap:0}
+  ol.phases li{counter-increment:ph;display:grid;grid-template-columns:auto 1fr;gap:18px;
+    padding:20px 0;border-bottom:1px solid var(--rule-soft)}
+  ol.phases li:last-child{border-bottom:none}
+  ol.phases li::before{
+    content:counter(ph,decimal-leading-zero);font-family:var(--mono);font-size:.78rem;
+    font-weight:600;color:var(--accent);border:1px solid var(--rule);background:var(--surface);
+    width:34px;height:34px;display:grid;place-items:center;border-radius:50%;
+    font-variant-numeric:tabular-nums;
+  }
+  .ph-body{display:flex;flex-direction:column;gap:7px}
+  .ph-body h3{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px}
+  .ph-when{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-3);font-weight:400}
+  .ph-body p{font-size:.94rem;color:var(--ink-2)}
+
+  /* ---------- callout ---------- */
+  .note{
+    border:1px solid var(--rule);border-left:2px solid var(--accent);background:var(--surface);
+    border-radius:6px;padding:15px 17px;display:flex;flex-direction:column;gap:7px;
+  }
+  .note h4{font-family:var(--mono);font-size:.7rem;letter-spacing:.11em;
+    text-transform:uppercase;color:var(--accent)}
+  .note p,.note li{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+  .note ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+
+  /* ---------- diagram ---------- */
+  .diagram{background:var(--surface);border:1px solid var(--rule);border-radius:8px;
+    padding:20px;overflow-x:auto}
+  .diagram svg{display:block;min-width:640px;width:100%;height:auto}
+
+  ul.plain{margin:0;padding-left:19px;display:flex;flex-direction:column;gap:8px}
+  ul.plain li{font-size:.93rem;color:var(--ink-2)}
+  ul.plain li b{color:var(--ink);font-weight:600}
+
+  footer{padding:34px 0 56px;color:var(--ink-3);font-size:.84rem}
+  footer a{color:var(--ink-2)}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (max-width:640px){
+    body{font-size:16px}
+    ol.phases li{grid-template-columns:1fr;gap:10px}
+    #spec{height:150px}
+    .hero-body{margin-top:-40px}
+  }
+</style>
+
+<header class="hero">
+  <canvas id="spec" aria-hidden="true"></canvas>
+  <div class="hero-mask"></div>
+  <div class="wrap hero-body">
+    <p class="eyebrow">Capability map &middot; compiled 15 Aug 2026</p>
+    <h1>The Earth Species<br><span class="accent-word">Stack</span></h1>
+    <p class="lede col">Earth Species Project has open-sourced almost the entire pipeline for decoding animal
+      communication &mdash; 44 repositories, 19 model checkpoints, a 17.6&nbsp;TB training corpus and four benchmarks.
+      This is what exists, what runs on an 8&nbsp;GB laptop, and what we build first.</p>
+
+    <div class="stats">
+      <div class="stat"><b>44</b><span>Public repos</span></div>
+      <div class="stat"><b>22</b><span>Publications</span></div>
+      <div class="stat"><b>19</b><span>HF models</span></div>
+      <div class="stat"><b>8</b><span>HF datasets</span></div>
+      <div class="stat"><b>34</b><span>alp-data sets</span></div>
+      <div class="stat"><b>9,422</b><span>Bird species</span></div>
+    </div>
+  </div>
+</header>
+
+<nav class="jump" aria-label="Sections">
+  <div class="wrap">
+    <ul>
+      <li><a href="#stack">The stack</a></li>
+      <li><a href="#tools">Tool matrix</a></li>
+      <li><a href="#models">Models</a></li>
+      <li><a href="#data">Data</a></li>
+      <li><a href="#papers">Research</a></li>
+      <li><a href="#build">What we build</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+      <li><a href="#traps">Traps</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+
+<!-- ============ THE STACK ============ -->
+<section id="stack">
+  <div class="wrap stack">
+    <div class="sec-head">
+      <p class="eyebrow">Orientation</p>
+      <h2>Five layers, and they compose</h2>
+      <p class="lede">ESP's tools aren't 44 separate projects. They're a stack: a data layer feeding encoders,
+        encoders feeding task heads, and a language model sitting on top &mdash; each layer independently usable.
+        Read it bottom-up.</p>
+    </div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 900 396" role="img" aria-label="Diagram of the Earth Species stack: data layer feeds encoders, which feed task heads, with a language layer on top and benchmarks measuring every layer.">
+        <defs>
+          <marker id="ar" markerWidth="8" markerHeight="8" refX="6.4" refY="3.2" orient="auto">
+            <path d="M0,0 L6.4,3.2 L0,6.4 z" fill="var(--ink-3)"/>
+          </marker>
+        </defs>
+
+        <!-- L5 language -->
+        <rect x="34" y="14" width="600" height="60" rx="7" fill="var(--surface-3)" stroke="var(--accent)" stroke-width="1.5"/>
+        <text x="50" y="37" font-family="var(--mono)" font-size="10.5" letter-spacing="1.6" fill="var(--accent)">LANGUAGE LAYER</text>
+        <text x="50" y="59" font-family="var(--serif)" font-size="15" fill="var(--ink)">NatureLM-audio &mdash; BEATs + Q-Former + Llama-3.1-8B &middot; ask audio a question in English</text>
+
+        <!-- L4 task heads -->
+        <rect x="34" y="94" width="600" height="86" rx="7" fill="var(--surface-2)" stroke="var(--rule)"/>
+        <text x="50" y="115" font-family="var(--mono)" font-size="10.5" letter-spacing="1.6" fill="var(--ink-3)">TASK HEADS</text>
+        <g font-family="var(--mono)" font-size="11.5" fill="var(--ink)">
+          <rect x="50" y="126" width="128" height="21" rx="4" fill="var(--surface)" stroke="var(--rule)"/><text x="60" y="141">Voxaboxen</text>
+          <rect x="186" y="126" width="128" height="21" rx="4" fill="var(--surface)" stroke="var(--rule)"/><text x="196" y="141">DRASDIC</text>
+          <rect x="322" y="126" width="128" height="21" rx="4" fill="var(--surface)" stroke="var(--rule)"/><text x="332" y="141">BirdCODE</text>
+          <rect x="458" y="126" width="160" height="21" rx="4" fill="var(--surface)" stroke="var(--rule)"/><text x="468" y="141">biodenoising</text>
+        </g>
+        <g font-family="var(--serif)" font-size="10.5" fill="var(--ink-3)">
+          <text x="50" y="164">overlap-robust</text><text x="50" y="176">event boxes</text>
+          <text x="186" y="164">few-shot, 30&thinsp;s</text><text x="186" y="176">support clip</text>
+          <text x="322" y="164">9,422-species</text><text x="322" y="176">frame detector</text>
+          <text x="458" y="164">clean-data-free</text><text x="458" y="176">denoiser</text>
+        </g>
+
+        <!-- L3 encoders -->
+        <rect x="34" y="200" width="600" height="86" rx="7" fill="var(--surface-2)" stroke="var(--rule)"/>
+        <text x="50" y="221" font-family="var(--mono)" font-size="10.5" letter-spacing="1.6" fill="var(--ink-3)">ENCODERS &mdash; the layer that runs on your laptop</text>
+        <g font-family="var(--mono)" font-size="11.5" fill="var(--ink)">
+          <rect x="50" y="232" width="128" height="21" rx="4" fill="var(--surface)" stroke="var(--ok)"/><text x="60" y="247">AVEX / aves2</text>
+          <rect x="186" y="232" width="128" height="21" rx="4" fill="var(--surface)" stroke="var(--ok)"/><text x="196" y="247">AVES / BirdAVES</text>
+          <rect x="322" y="232" width="128" height="21" rx="4" fill="var(--surface)" stroke="var(--ok)"/><text x="332" y="247">ISPA</text>
+          <rect x="458" y="232" width="160" height="21" rx="4" fill="var(--surface)" stroke="var(--ok)"/><text x="468" y="247">multiband-audio</text>
+        </g>
+        <g font-family="var(--serif)" font-size="10.5" fill="var(--ink-3)">
+          <text x="50" y="270">BEATs / EAT / EffNet</text><text x="50" y="282">~90&thinsp;M params</text>
+          <text x="186" y="270">HuBERT-style SSL</text><text x="186" y="282">95&ndash;316&thinsp;M</text>
+          <text x="322" y="270">audio &rarr; text</text><text x="322" y="282">tokens</text>
+          <text x="458" y="270">ultrasonic via</text><text x="458" y="282">heterodyning</text>
+        </g>
+
+        <!-- L2 data -->
+        <rect x="34" y="306" width="600" height="72" rx="7" fill="var(--surface-3)" stroke="var(--cyan)" stroke-width="1.5"/>
+        <text x="50" y="327" font-family="var(--mono)" font-size="10.5" letter-spacing="1.6" fill="var(--cyan)">DATA LAYER</text>
+        <text x="50" y="349" font-family="var(--serif)" font-size="15" fill="var(--ink)">alp-data &mdash; 34 bioacoustic datasets behind one Python interface, streamable</text>
+        <text x="50" y="367" font-family="var(--serif)" font-size="11" fill="var(--ink-3)">Xeno-canto &middot; iNaturalist &middot; Watkins &middot; BirdSet &middot; AnimalSpeak &middot; gibbons, geladas, otters, killer whales</text>
+
+        <!-- arrows -->
+        <g stroke="var(--ink-3)" stroke-width="1.3" marker-end="url(#ar)" fill="none">
+          <path d="M334,306 L334,290"/>
+          <path d="M334,200 L334,184"/>
+          <path d="M334,94 L334,78"/>
+        </g>
+
+        <!-- benchmark rail -->
+        <rect x="660" y="14" width="206" height="364" rx="7" fill="var(--surface)" stroke="var(--rule)" stroke-dasharray="3 3"/>
+        <text x="676" y="37" font-family="var(--mono)" font-size="10.5" letter-spacing="1.6" fill="var(--ink-3)">BENCHMARKS</text>
+        <g font-family="var(--mono)" font-size="11.5" fill="var(--ink)">
+          <text x="676" y="70">BEANS</text>
+          <text x="676" y="128">BEANS-Zero</text>
+          <text x="676" y="186">BEANS-Next</text>
+          <text x="676" y="244">BEBE</text>
+          <text x="676" y="302">BAGEL</text>
+        </g>
+        <g font-family="var(--serif)" font-size="10.5" fill="var(--ink-3)">
+          <text x="676" y="86">12 supervised datasets,</text><text x="676" y="98">classification + detection</text>
+          <text x="676" y="144">zero-shot audio&ndash;text,</text><text x="676" y="156">91,965 items</text>
+          <text x="676" y="202">4-tier reasoning,</text><text x="676" y="214">43 tasks, 57,637 items</text>
+          <text x="676" y="260">bio-logger behaviour</text><text x="676" y="272">from accelerometers</text>
+          <text x="676" y="318">animal knowledge in</text><text x="676" y="330">LLMs, 11,852 MCQs</text>
+        </g>
+        <line x1="640" y1="196" x2="656" y2="196" stroke="var(--ink-3)" stroke-width="1.3" marker-end="url(#ar)"/>
+      </svg>
+    </div>
+
+    <div class="grid g3">
+      <div class="card">
+        <span class="tag">The one to start with</span>
+        <h3>AVEX</h3>
+        <p>One <code>load_model()</code> call gets you BEATs, EAT, EfficientNet, AVES, BirdAVES, BirdNET or Perch&nbsp;2
+          with a shared embedding API. The ICLR&nbsp;2026 paper behind it is a systematic study of what actually
+          makes a good bioacoustic encoder &mdash; the winner is SSL pre-training then supervised post-training on
+          bioacoustics <em>plus</em> AudioSet.</p>
+        <div class="meta"><span class="chip ch-ok">runs local</span><span class="chip ch-dim">~90M params</span></div>
+      </div>
+      <div class="card">
+        <span class="tag">The headline model</span>
+        <h3>NatureLM-audio</h3>
+        <p>The first audio-language model for animal sounds. You prompt it in English &mdash;
+          <em>&ldquo;What is the common name for the focal species?&rdquo;</em> &mdash; and it answers, including for
+          species it has never heard. Watkins marine mammals: 0.788 vs 0.257 for the next best model.</p>
+        <div class="meta"><span class="chip ch-gpu">24 GB GPU</span><span class="chip ch-dim">8.7B params</span></div>
+      </div>
+      <div class="card">
+        <span class="tag">The unlock for small teams</span>
+        <h3>DRASDIC</h3>
+        <p>Few-shot detection trained entirely on 8,800&nbsp;hours of synthetic domain-randomised scenes.
+          Label ~30&nbsp;seconds of one call type, and it finds every other instance in your recordings
+          with no fine-tuning. Beats training-free methods by 64% relative on the 13-task FASD13 benchmark.</p>
+        <div class="meta"><span class="chip ch-ok">runs local</span><span class="chip ch-dim">zero training</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TOOL MATRIX ============ -->
+<section id="tools">
+  <div class="wrap stack">
+    <div class="sec-head">
+      <p class="eyebrow">Inventory</p>
+      <h2>Every tool worth touching</h2>
+      <p class="lede">Thirty maintained or usable repositories, judged honestly against an Apple&nbsp;M2 with 8&nbsp;GB
+        of unified memory. Filter by what you can actually run tonight.</p>
+    </div>
+
+    <div>
+      <div class="filters">
+        <span class="lbl">Show</span>
+        <button class="f" data-f="all" aria-pressed="true">All</button>
+        <button class="f" data-f="yes" aria-pressed="false">Runs on M2</button>
+        <button class="f" data-f="partial" aria-pressed="false">Needs patching</button>
+        <button class="f" data-f="no" aria-pressed="false">Needs a GPU</button>
+        <button class="f" data-f="active" aria-pressed="false">Actively maintained</button>
+        <span class="count" id="tcount">30 shown</span>
+      </div>
+
+      <div class="tscroll">
+        <table id="tools-table">
+          <thead>
+            <tr><th>Repo</th><th>What it gives you</th><th>M2&nbsp;/&nbsp;8GB</th><th>Install</th><th class="num">★</th></tr>
+          </thead>
+          <tbody>
+            <tr data-run="yes" data-mat="active"><td class="name">avex</td><td class="t-note">Unified loader + probes for 10 ESP encoders and BirdNET/Perch. The model zoo.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">pip avex</td><td class="num">41</td></tr>
+            <tr data-run="yes" data-mat="stable"><td class="name">aves</td><td class="t-note">Original AVES + BirdAVES weights, TorchAudio &amp; ONNX. Frozen; folded into avex.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">pip esp-aves</td><td class="num">145</td></tr>
+            <tr data-run="yes" data-mat="active"><td class="name">alp-data</td><td class="t-note">34 bioacoustic datasets, one interface, streaming, PyTorch DataLoader ready.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">pip alp-data</td><td class="num">35</td></tr>
+            <tr data-run="no" data-mat="active"><td class="name">NatureLM-audio</td><td class="t-note">The audio-LLM: inference CLI, Gradio app, training code, BEANS-Zero eval.</td><td><span class="chip ch-gpu">no</span></td><td class="name c-dim">uv sync</td><td class="num">100</td></tr>
+            <tr data-run="partial" data-mat="active"><td class="name">voxaboxen</td><td class="t-note">Overlap-robust event detection. Train on GPU, infer on CPU. Raven-native.</td><td><span class="chip ch-warn">infer only</span></td><td class="name c-dim">git + conda</td><td class="num">42</td></tr>
+            <tr data-run="yes" data-mat="active"><td class="name">biodenoising</td><td class="t-note">Demucs denoiser for animal calls, ~19M params, faster than real time on CPU.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">pip biodenoising</td><td class="num">27</td></tr>
+            <tr data-run="partial" data-mat="active"><td class="name">sound-event-detection</td><td class="t-note">BirdCODE: frame-level detector over 9,422 bird species. 1.1&nbsp;GB checkpoint, CPU-supported.</td><td><span class="chip ch-warn">slow</span></td><td class="name c-dim">uv sync</td><td class="num">2</td></tr>
+            <tr data-run="partial" data-mat="research"><td class="name">drasdic_api</td><td class="t-note">Few-shot in-context detection. ~110M transformer; CPU inference on short clips.</td><td><span class="chip ch-warn">short clips</span></td><td class="name c-dim">git clone</td><td class="num">1</td></tr>
+            <tr data-run="partial" data-mat="stable"><td class="name">beans</td><td class="t-note">The original 12-dataset benchmark + baselines. Needs ~300&nbsp;GB for the full set.</td><td><span class="chip ch-warn">subset</span></td><td class="name c-dim">git + pip -e</td><td class="num">120</td></tr>
+            <tr data-run="yes" data-mat="stable"><td class="name">beans-zero</td><td class="t-note">Zero-shot eval toolkit. Streams the dataset; no model included.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">git + pip -e</td><td class="num">4</td></tr>
+            <tr data-run="partial" data-mat="active"><td class="name">beans-next</td><td class="t-note">HTTP-first benchmark harness. Core is CPU-only; models served as FastAPI launchers.</td><td><span class="chip ch-warn">harness only</span></td><td class="name c-dim">uv sync</td><td class="num">0</td></tr>
+            <tr data-run="yes" data-mat="stable"><td class="name">BEBE</td><td class="t-note">Bio-logger behaviour benchmark: 9 accelerometer datasets, CRNN/harnet/RF baselines.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">git + conda</td><td class="num">29</td></tr>
+            <tr data-run="yes" data-mat="stable"><td class="name">BEBE-datasets</td><td class="t-note">Notebooks to convert your own tag data into BEBE format.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">notebooks</td><td class="num">3</td></tr>
+            <tr data-run="yes" data-mat="research"><td class="name">ispa</td><td class="t-note">Transcribes animal sound into readable phonetic-style text so LMs can read it.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">git clone</td><td class="num">29</td></tr>
+            <tr data-run="yes" data-mat="research"><td class="name">multiband-audio</td><td class="t-note">Heterodyne any sample rate into 8&nbsp;kHz bands so 16&nbsp;kHz encoders can hear bats.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">pip multiband-audio</td><td class="num">2</td></tr>
+            <tr data-run="yes" data-mat="active"><td class="name">pysoundgen</td><td class="t-note">Parametric vocalization synthesizer &mdash; numpy only. Makes labelled synthetic data.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">git clone</td><td class="num">0</td></tr>
+            <tr data-run="partial" data-mat="research"><td class="name">fewshot</td><td class="t-note">DCASE 2024 few-shot submission, precursor to DRASDIC. Device hard-coded to CUDA.</td><td><span class="chip ch-warn">patch device</span></td><td class="name c-dim">git clone</td><td class="num">1</td></tr>
+            <tr data-run="yes" data-mat="stable"><td class="name">biodenoising-inference</td><td class="t-note">Inference-only denoiser, including a live microphone streaming mode.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">git clone</td><td class="num">8</td></tr>
+            <tr data-run="yes" data-mat="research"><td class="name">biodenoising-datasets</td><td class="t-note">Downloader/processor for ~80 vocalization and noise datasets via YAML config.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">git clone</td><td class="num">6</td></tr>
+            <tr data-run="yes" data-mat="research"><td class="name">ancient-calls</td><td class="t-note">Estimates the evolutionary age of a call type from embeddings + a dated phylogeny.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">pip -e + R</td><td class="num">1</td></tr>
+            <tr data-run="partial" data-mat="research"><td class="name">cocktail-party-problem</td><td class="t-note">BioCPPNet source separation for overlapping conspecific calls. Tiny models.</td><td><span class="chip ch-warn">patch device</span></td><td class="name c-dim">scripts</td><td class="num">76</td></tr>
+            <tr data-run="partial" data-mat="research"><td class="name">sound-separation</td><td class="t-note">Google bird-MixIT applied to ESP crow/finch data. TensorFlow 1-era code.</td><td><span class="chip ch-warn">TF1</span></td><td class="name c-dim">git clone</td><td class="num">2</td></tr>
+            <tr data-run="partial" data-mat="mirror"><td class="name">perch2-server</td><td class="t-note">Google Perch&nbsp;2 wrapped in FastAPI. 12M params, has an explicit CPU mode.</td><td><span class="chip ch-warn">install risk</span></td><td class="name c-dim">uv + Kaggle</td><td class="num">0</td></tr>
+            <tr data-run="yes" data-mat="mirror"><td class="name">audioprotopnet-server</td><td class="t-note">Interpretable prototype-based bird classifier behind the same HTTP contract.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">uv sync</td><td class="num">0</td></tr>
+            <tr data-run="partial" data-mat="research"><td class="name">spectral_hyperresolution</td><td class="t-note">Super-resolution spectrograms via linear reassignment. Memory-hungry on long files.</td><td><span class="chip ch-warn">short clips</span></td><td class="name c-dim">pip -e</td><td class="num">24</td></tr>
+            <tr data-run="yes" data-mat="research"><td class="name">Elephant-choruses</td><td class="t-note">Rumble data + code: predict social context, test acoustic convergence. Data included.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">scripts</td><td class="num">0</td></tr>
+            <tr data-run="yes" data-mat="research"><td class="name">biodcase_2025_task1</td><td class="t-note">BioDCASE multi-channel alignment baseline &mdash; a live challenge ESP co-organises.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">git clone</td><td class="num">1</td></tr>
+            <tr data-run="yes" data-mat="stable"><td class="name">intro-to-DSP-with-python</td><td class="t-note">Five beginner notebooks on sound, loudness, spectrograms. Best onboarding in the org.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">notebooks</td><td class="num">209</td></tr>
+            <tr data-run="yes" data-mat="stable"><td class="name">library</td><td class="t-note">2021 notebooks that download 10 classic datasets (macaques, bats, otters, orcas).</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">notebooks</td><td class="num">83</td></tr>
+            <tr data-run="yes" data-mat="stable"><td class="name">naturelm-audio-demo</td><td class="t-note">~50 curated clips with gold labels and the exact prompts &mdash; a free sanity-check set.</td><td><span class="chip ch-ok">yes</span></td><td class="name c-dim">static site</td><td class="num">6</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="note col">
+      <h4>The other 14 repos</h4>
+      <p>Archived or historical, kept for the record: <code>project</code> (the 2022 roadmap, 300★),
+        <code>cornell-birdcall-competition-starter-pack</code>, <code>acoustic-representation-toolbox</code>,
+        <code>sperm-whale-clan-and-coda-detection</code>, <code>macaques_open_collaboration</code>,
+        <code>unsupervised-speech-translation</code>, <code>audio-embeddings</code>,
+        <code>decoder-head-unsupervised-translation</code>, <code>autoencoder-toolbox</code>,
+        <code>embedding-gym</code>, <code>utilities</code>, <code>dolphin-strandings</code>,
+        <code>fairseq</code> (a fork with a bio-logger HuBERT branch), <code>animalsynth</code>.
+        Worth reading, not worth reviving &mdash; most target fastai2 and 2020-era PyTorch.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODELS ============ -->
+<section id="models">
+  <div class="wrap stack">
+    <div class="sec-head">
+      <p class="eyebrow">Weights</p>
+      <h2>The model zoo</h2>
+      <p class="lede">Nineteen checkpoints on Hugging Face, none gated. The AVEX family is the practical
+        core: eleven encoders around 90&nbsp;M parameters that load in one line and fit comfortably in memory.</p>
+    </div>
+
+    <div class="tscroll">
+      <table>
+        <thead>
+          <tr><th>Checkpoint</th><th>Architecture</th><th class="num">Params</th><th class="num">Size</th><th>Load with</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="name">NatureLM-audio</td><td class="t-note">BEATs → Q-Former → Llama-3.1-8B (LoRA r=32)</td><td class="num">8.7B</td><td class="num">1.56 GB<sup>†</sup></td><td class="name c-dim">NatureLM.from_pretrained</td></tr>
+          <tr><td class="name">esp-aves2-sl-beats-all</td><td class="t-note">BEATs, SSL then supervised on bio + AudioSet — <b>the best all-rounder</b></td><td class="num">100M</td><td class="num">401 MB</td><td class="name c-dim">avex.load_model</td></tr>
+          <tr><td class="name">esp-aves2-sl-beats-bio</td><td class="t-note">Same, bioacoustics only (12,279 classes)</td><td class="num">100M</td><td class="num">399 MB</td><td class="name c-dim">avex.load_model</td></tr>
+          <tr><td class="name">esp-aves2-eat-all / -bio</td><td class="t-note">EAT, SSL-only embedding models</td><td class="num">93M</td><td class="num">370 MB</td><td class="name c-dim">avex.load_model</td></tr>
+          <tr><td class="name">esp-aves2-sl-eat-*</td><td class="t-note">EAT with supervised post-training (2 variants)</td><td class="num">99M</td><td class="num">398 MB</td><td class="name c-dim">avex.load_model</td></tr>
+          <tr><td class="name">esp-aves2-naturelm-v1-beats</td><td class="t-note">The BEATs encoder extracted from NatureLM-audio</td><td class="num">91M</td><td class="num">363 MB</td><td class="name c-dim">avex.load_model</td></tr>
+          <tr><td class="name">esp-aves2-effnetb0-*</td><td class="t-note">EfficientNet-B0 on log-mel — best for individual ID and repertoire</td><td class="num">5–21M</td><td class="num">19–82 MB</td><td class="name c-dim">avex.load_model</td></tr>
+          <tr><td class="name">sed-birdcode</td><td class="t-note">AudioProtoPNet frame detector, 188,440 prototypes, 9,422 species</td><td class="num">~280M</td><td class="num">1.12 GB</td><td class="name c-dim">FrameDetector.from_hf_hub</td></tr>
+          <tr><td class="name">sed-birdcode-ablation-*</td><td class="t-note">Seven training-recipe ablations of BirdCODE</td><td class="num">—</td><td class="num">0.5–1.1 GB</td><td class="name c-dim">FrameDetector.from_hf_hub</td></tr>
+          <tr><td class="name">AVES / BirdAVES</td><td class="t-note">HuBERT-style SSL — served from Google Cloud Storage, not HF</td><td class="num">95–316M</td><td class="num">378 MB–1.26 GB</td><td class="name c-dim">aves.load_feature_extractor</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small col"><sup>†</sup> NatureLM's 1.56&nbsp;GB is only the adapter, encoder and embeddings &mdash;
+      the Llama-3.1-8B body downloads separately from a gated Meta repo, so you need a Hugging Face token
+      with Llama access on top of the 24&nbsp;GB of VRAM.</p>
+
+    <div class="note col">
+      <h4>Licensing, read this before you build a product</h4>
+      <p>Every ESP checkpoint on Hugging Face is <b>CC-BY-NC-SA-4.0</b> &mdash; non-commercial, share-alike.
+        The code is mostly MIT, but Voxaboxen is <b>AGPL-3.0</b> and BEBE is <b>GPL-3.0</b>. The BirdCODE
+        checkpoints currently declare no license at all. Research and internal work are fine;
+        anything commercial needs a conversation with ESP first.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DATA ============ -->
+<section id="data">
+  <div class="wrap stack">
+    <div class="sec-head">
+      <p class="eyebrow">Corpora</p>
+      <h2>Data, and how not to drown in it</h2>
+      <p class="lede">The training corpus alone is 17.6&nbsp;terabytes. Everything here streams &mdash;
+        never call <code>load_dataset()</code> without <code>streaming=True</code> on this machine.</p>
+    </div>
+
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>Dataset</th><th>What it is</th><th class="num">Rows</th><th class="num">Size</th><th>Use for</th></tr></thead>
+        <tbody>
+          <tr><td class="name">NatureLM-audio-training</td><td class="t-note">Audio–text instruction pairs, ~22,000 hours</td><td class="num">26.4M</td><td class="num">17.62 TB</td><td class="t-note">Stream a slice for fine-tuning experiments</td></tr>
+          <tr><td class="name">BEANS-Next</td><td class="t-note">4-tier reasoning benchmark, 43 tasks</td><td class="num">57,637</td><td class="num">146.6 GB</td><td class="t-note">The current bar for audio-language models</td></tr>
+          <tr><td class="name">BEANS-Zero</td><td class="t-note">Zero-shot audio–text test set</td><td class="num">91,965</td><td class="num">50.5 GB</td><td class="t-note">Evaluating any zero-shot model, streamable</td></tr>
+          <tr><td class="name">ROOTS</td><td class="t-note">44.8M generated tasks, audio referenced not hosted</td><td class="num">44.8M</td><td class="num">2.93 GB</td><td class="t-note">Prompt/task design — tiny download</td></tr>
+          <tr><td class="name">beans-next-small</td><td class="t-note">20 items per task, stratified</td><td class="num">860</td><td class="num">1.25 GB</td><td class="t-note"><b>Start here.</b> Smoke tests that finish</td></tr>
+          <tr><td class="name">synthetic-strong-detection</td><td class="t-note">Synthetic scenes with strong labels</td><td class="num">—</td><td class="num">—</td><td class="t-note">Training detectors without annotation</td></tr>
+          <tr><td class="name">synthetic-detect-diarize</td><td class="t-note">Detection + diarization synthetic set</td><td class="num">—</td><td class="num">—</td><td class="t-note">Who-called-when experiments</td></tr>
+          <tr><td class="name">animalspeak-pseudovox</td><td class="t-note">Pseudo-labelled vocalization crops</td><td class="num">—</td><td class="num">—</td><td class="t-note">Augmentation, pseudo-labelling</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <span class="tag">The front door</span>
+        <h3>alp-data</h3>
+        <p>Thirty-four datasets &mdash; Xeno-canto, iNaturalist, Watkins, BirdSet, AnimalSpeak, plus specialist sets
+          for gibbons, geladas, giant otters, marmosets, killer whales and individual-ID tasks &mdash; all behind
+          one class with consistent resampling, labels and streaming. Released July 2026.</p>
+<pre><code>from alp_data import Beans
+b = Beans(split="train", sample_rate=16000,
+          streaming=True)
+for s in b:
+    print(s["audio"].shape); break</code></pre>
+        <div class="meta"><span class="chip ch-ok">pip install alp-data</span></div>
+      </div>
+      <div class="card">
+        <span class="tag">Field partnerships</span>
+        <h3>Where the data comes from</h3>
+        <p>ESP works with named field programmes, and those partnerships are what the tools are shaped around:
+          <b>killer whales</b> in Johnstone Strait with Raincoast Conservation Foundation; <b>carrion crows</b> in
+          northern Spain with the University of León &mdash; 52 biologger deployments, 127,750 vocalizations
+          detected by Voxaboxen; <b>zebra finches</b> at McGill, where a generative model now holds live
+          two-way vocal exchanges with real birds; and <b>Hawaiian crows</b> with St Andrews.</p>
+        <div class="meta"><span class="chip ch-dim">Cornell · MBARI · ElephantVoices · FrogID</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAPERS ============ -->
+<section id="papers">
+  <div class="wrap stack">
+    <div class="sec-head">
+      <p class="eyebrow">Research</p>
+      <h2>What the papers actually established</h2>
+      <p class="lede">Twenty-two publications, and a clear arc: build encoders, benchmark them honestly,
+        then put language on top. The results below are the ones that change what we should build.</p>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <span class="tag">ICLR 2026 · foundation</span>
+        <h3>AVEX: what matters for animal vocalization encoding</h3>
+        <p>A 26-dataset study of encoder recipes. Best result comes from SSL pre-training followed by supervised
+          post-training on bioacoustics <em>plus</em> AudioSet &mdash; BEANS classification 0.840, beating BirdNET
+          and Perch. Notably, the tiny EfficientNet-B0 wins on individual ID (0.531) and repertoire tasks (0.582),
+          so bigger is not automatically better.</p>
+        <div class="meta"><span class="chip ch-ok">weights released</span><span class="chip ch-dim">arXiv 2508.11845</span></div>
+      </div>
+      <div class="card">
+        <span class="tag">ICASSP 2026 · method</span>
+        <h3>Multi-layer attentive probing</h3>
+        <p>How you read an encoder changes which encoder looks best. Swapping the standard last-layer linear probe
+          for a multi-layer attention probe adds ~0.08 accuracy on BEANS classification and detection, and reorders
+          the leaderboard. The probe has ~1&ndash;2&nbsp;M parameters and trains in minutes on cached embeddings.</p>
+        <div class="meta"><span class="chip ch-ok">highest leverage for us</span></div>
+      </div>
+      <div class="card">
+        <span class="tag">ICLR 2025 · foundation</span>
+        <h3>NatureLM-audio</h3>
+        <p>Transfer from human speech and music into bioacoustics genuinely works. Zero-shot on unseen species by
+          taxonomic name: 0.343 versus 0.014 for CLAP. Call type 0.871, life stage 0.794, captioning SPIDEr 0.532
+          versus 0.009 for the nearest audio-LLM.</p>
+        <div class="meta"><span class="chip ch-gpu">needs a GPU</span><span class="chip ch-dim">arXiv 2411.07186</span></div>
+      </div>
+      <div class="card">
+        <span class="tag">2025 · detection</span>
+        <h3>Voxaboxen &amp; DRASDIC</h3>
+        <p>Two complementary detectors. Voxaboxen predicts onset/offset boxes and stays accurate through overlap
+          &mdash; 97.9 mAP on overlapping zebra finch audio versus 78.3 for a frame-based BEATs baseline. DRASDIC
+          needs no training data at all: 8,800&nbsp;hours of synthetic scenes taught it to generalise from a
+          30-second example.</p>
+        <div class="meta"><span class="chip ch-ok">both usable now</span></div>
+      </div>
+      <div class="card">
+        <span class="tag">DCASE 2025 · surprising</span>
+        <h3>Crossing the species divide</h3>
+        <p>Frozen human-speech models (WavLM, HuBERT, XEUS) with nothing but a linear probe rival fine-tuned
+          bioacoustic models on BEANS &mdash; Watkins 0.90, dogs 0.95. This is the cheapest strong baseline in the
+          entire field, and it runs on a laptop.</p>
+        <div class="meta"><span class="chip ch-ok">reproduce this first</span></div>
+      </div>
+      <div class="card">
+        <span class="tag">2024–2025 · signal</span>
+        <h3>Biodenoising &amp; ISPA</h3>
+        <p>Biodenoising trains a denoiser with no clean recordings at all, using speech-enhancement pseudo-targets;
+          ~9&nbsp;dB SI-SDR improvement, and the 19&nbsp;M-parameter model denoises faster than real time on CPU.
+          ISPA turns calls into readable token strings so ordinary text models can classify them.</p>
+        <div class="meta"><span class="chip ch-ok">both run local</span></div>
+      </div>
+    </div>
+
+    <div class="note col">
+      <h4>Also worth knowing</h4>
+      <ul>
+        <li><b>BAGEL</b> (2026) &mdash; 11,852 multiple-choice questions probing animal knowledge in LLMs. Frontier
+          models reach 0.76; the hardest category is describing vocalizations (0.59). A cheap regression test.</li>
+        <li><b>BEBE</b> (Movement Ecology 2024) &mdash; on bio-logger accelerometer data, a self-supervised model
+          trained on <em>human wrist</em> data wins 9 of 9 datasets when training data is scarce.</li>
+        <li><b>Carrion crows</b> (Animal Cognition 2025) &mdash; 127,750 calls detected at F1 0.78; most crow
+          communication turns out to be quiet, close-range family talk that microphones on trees never capture.</li>
+        <li><b>Bee dance</b> (Biological Reviews 2026) &mdash; argues the waggle dance is an ancestral iconic
+          semantic system, with a phylogenetic reconstruction putting vertical dancing in the common ancestor.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHAT WE BUILD ============ -->
+<section id="build">
+  <div class="wrap stack">
+    <div class="sec-head">
+      <p class="eyebrow">Options</p>
+      <h2>Six things we could build</h2>
+      <p class="lede">Each is scoped to what this hardware can actually do. The first two need nothing
+        but a laptop and an afternoon.</p>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <span class="tag">Recommended first</span>
+        <h3>Repertoire mapper</h3>
+        <p>Stream a species from <code>alp-data</code>, embed every clip with <code>esp_aves2_sl_beats_all</code>,
+          mean-pool, then UMAP and cluster. You get a map of call types with audio you can play back per cluster.
+          This is the core loop behind ESP's crow and zebra-finch work, at laptop scale.</p>
+        <div class="meta"><span class="chip ch-ok">CPU · one day</span><span class="chip ch-dim">avex + alp-data</span></div>
+      </div>
+      <div class="card">
+        <span class="tag">Recommended first</span>
+        <h3>The cheap strong baseline</h3>
+        <p>Reproduce <em>Crossing the Species Divide</em>: cache WavLM layer activations for a small BEANS subset,
+          train linear probes per layer, find the best layer per taxon. Then add the multi-layer attention probe
+          from the ICASSP 2026 paper and measure the gain yourself.</p>
+        <div class="meta"><span class="chip ch-ok">CPU · one day</span><span class="chip ch-dim">publishable-adjacent</span></div>
+      </div>
+      <div class="card">
+        <span class="tag">Highest practical payoff</span>
+        <h3>Zero-label detector</h3>
+        <p>Take our own field recordings, annotate 30 seconds of one call type, and let DRASDIC find every other
+          instance. Compare against BirdCODE's 9,422-species frame detector on the same audio. No training,
+          no annotation budget.</p>
+        <div class="meta"><span class="chip ch-warn">CPU, short clips</span><span class="chip ch-dim">drasdic + sed</span></div>
+      </div>
+      <div class="card">
+        <span class="tag">Pipeline</span>
+        <h3>Denoise → detect → describe</h3>
+        <p>Chain the three layers: <code>biodenoising</code> to clean a noisy field recording, BirdCODE or Voxaboxen
+          to find the events, then NatureLM-audio on the HF Space to caption the interesting ones. Measure whether
+          denoising actually improves downstream detection &mdash; nobody has published that ablation cleanly.</p>
+        <div class="meta"><span class="chip ch-ok">mostly CPU</span><span class="chip ch-dim">real finding possible</span></div>
+      </div>
+      <div class="card">
+        <span class="tag">Novel angle</span>
+        <h3>Symbolic layer</h3>
+        <p>Run ISPA over a corpus to get text strings, then apply ordinary NLP &mdash; n-gram statistics, entropy
+          rate, sequence models &mdash; to ask whether a species' call sequences carry structure beyond the single
+          call. Cheap, and the analysis tooling is fifty years mature.</p>
+        <div class="meta"><span class="chip ch-ok">CPU</span><span class="chip ch-dim">ispa + pysoundgen</span></div>
+      </div>
+      <div class="card">
+        <span class="tag">Contribution</span>
+        <h3>Enter BioDCASE 2026</h3>
+        <p>ESP co-organises Task&nbsp;1 (multi-channel alignment) and publishes the baseline. A live challenge with
+          released data and a deadline is the fastest way to have work that is comparable to everyone else's
+          rather than a demo in a notebook.</p>
+        <div class="meta"><span class="chip ch-dim">check current deadline</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ROADMAP ============ -->
+<section id="roadmap">
+  <div class="wrap stack">
+    <div class="sec-head">
+      <p class="eyebrow">Sequence</p>
+      <h2>How we proceed</h2>
+      <p class="lede">Each phase produces something runnable, and each one decides what the next phase is about.
+        Phase&nbsp;1 is already underway.</p>
+    </div>
+
+    <ol class="phases">
+      <li>
+        <div class="ph-body">
+          <h3>Stand up the local stack <span class="ph-when">in progress</span></h3>
+          <p>Python&nbsp;3.12 environment on the SSD, <code>avex</code> and <code>alp-data</code> installed, first
+            embeddings extracted on CPU. Verify MPS works and measure how long 1,000 clips actually takes.
+            Deliverable: a notebook that goes from a dataset name to a UMAP plot.</p>
+          <div class="meta"><span class="chip ch-ok">no cloud needed</span></div>
+        </div>
+      </li>
+      <li>
+        <div class="ph-body">
+          <h3>Choose the question <span class="ph-when">next</span></h3>
+          <p>Everything downstream depends on which animal and which question we care about. Options: a species
+            with good open data (crows, gibbons, giant otters, zebra finches all have curated sets in alp-data),
+            or our own recordings. Pick one, and the tool choices stop being abstract.</p>
+          <div class="meta"><span class="chip ch-dim">decision, not code</span></div>
+        </div>
+      </li>
+      <li>
+        <div class="ph-body">
+          <h3>Baseline honestly</h3>
+          <p>Before training anything: frozen encoder + linear probe, plus the WavLM speech-transfer baseline.
+            The DCASE 2025 result says these are hard to beat, so knowing the number keeps us from
+            celebrating a worse model later.</p>
+          <div class="meta"><span class="chip ch-ok">CPU</span></div>
+        </div>
+      </li>
+      <li>
+        <div class="ph-body">
+          <h3>Detection without annotation</h3>
+          <p>Apply DRASDIC and BirdCODE to the chosen audio. If few-shot detection is good enough, we skip the
+            annotation phase entirely. If not, we now know exactly how much labelling Voxaboxen would need.</p>
+          <div class="meta"><span class="chip ch-warn">CPU, patient</span></div>
+        </div>
+      </li>
+      <li>
+        <div class="ph-body">
+          <h3>Rent a GPU, once</h3>
+          <p>The only steps that genuinely need one: fine-tuning Voxaboxen on our own annotations, and running
+            NatureLM-audio over a real corpus rather than one clip at a time in the Space. A single 24&nbsp;GB
+            instance for a few hours covers both.</p>
+          <div class="meta"><span class="chip ch-gpu">24 GB · hours, not weeks</span></div>
+        </div>
+      </li>
+      <li>
+        <div class="ph-body">
+          <h3>Give something back</h3>
+          <p>Three real routes: contribute a dataset to <code>alp-data</code>, submit to BioDCASE, or publish
+            the denoising-improves-detection ablation. ESP runs a Discord and a Discourse forum, and their
+            2026 budget is roughly $13&nbsp;M with an actively growing research team &mdash; this is a field
+            with room in it.</p>
+          <div class="meta"><span class="chip ch-dim">optional but cheap</span></div>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ TRAPS ============ -->
+<section id="traps">
+  <div class="wrap stack">
+    <div class="sec-head">
+      <p class="eyebrow">Hard-won</p>
+      <h2>Traps, found the hard way</h2>
+    </div>
+
+    <div class="grid g2">
+      <div class="note">
+        <h4>This machine</h4>
+        <ul>
+          <li>The SSD is <b>ExFAT</b>. It has no symlinks, and macOS scatters <code>._</code> sidecar files that
+            break <code>uv</code>'s source-distribution builds and venv installs. Working recipe:
+            <code>python3.12 -m venv --copies</code> with pip, and point <code>TMPDIR</code> at an APFS path
+            while keeping the venv and caches on the SSD.</li>
+          <li>The internal drive has under 3&nbsp;GB free. Set <code>HF_HOME</code> to the SSD before any
+            Hugging Face download, or a single checkpoint will fill the boot disk.</li>
+          <li>8&nbsp;GB of unified memory rules out the 8B-parameter NatureLM backbone but is comfortable for
+            every ~90&nbsp;M encoder in the stack.</li>
+        </ul>
+      </div>
+      <div class="note">
+        <h4>Package-name landmines</h4>
+        <ul>
+          <li><code>pip install aves</code> installs an unrelated serial-port library. ESP's package is
+            <b><code>esp-aves</code></b>.</li>
+          <li><code>pip install beans</code> is someone else's API client. ESP's BEANS is GitHub-only.</li>
+          <li><code>biodenoising</code> and <code>biodenoising-inference</code> both import as
+            <code>biodenoising</code> and will collide. Install one.</li>
+          <li>Several research repos hard-code <code>device = "cuda"</code> &mdash; a one-line patch, but it
+            will look like a broken install if you don't expect it.</li>
+        </ul>
+      </div>
+      <div class="note">
+        <h4>Model behaviour</h4>
+        <ul>
+          <li>AVES embeddings <b>change with padding</b> &mdash; a HuBERT inheritance. Embed with batch size 1,
+            then pad. This silently degrades results if ignored.</li>
+          <li>NatureLM-audio is capped at 16&nbsp;kHz, so 8&nbsp;kHz Nyquist: <b>it cannot hear bats</b>, and
+            marine performance trails birds. Use <code>multiband-audio</code> for ultrasonic work.</li>
+          <li>The demo Space takes clips of 10&nbsp;seconds or less. Longer files need the Pipeline API with
+            sliding windows.</li>
+        </ul>
+      </div>
+      <div class="note">
+        <h4>Where to ask</h4>
+        <ul>
+          <li>Discourse forum: <code>earthspeciesproject.discourse.group</code> &mdash; the alp-data and
+            NatureLM threads are active.</li>
+          <li>Discord has run since 2021; GitHub issues on <code>avex</code> now cover the frozen
+            <code>aves</code> repo too.</li>
+          <li>The interactive dataset explorer at <code>alp-explorer.esp.dev</code> lets you filter 34 datasets
+            by species, ecosystem and location before downloading anything.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Compiled 15 August 2026 from earthspecies.org, the GitHub organisation (44 repos), Hugging Face
+      (19 models, 8 datasets), the ESP 2025 Annual Report and 22 publications. Figures are as stated by
+      those sources. Living plan: <code>/Volumes/SSD/esp-lab/PLAN.md</code>.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- tool matrix filter ---------- */
+  var btns = Array.prototype.slice.call(document.querySelectorAll('button.f'));
+  var rows = Array.prototype.slice.call(document.querySelectorAll('#tools-table tbody tr'));
+  var counter = document.getElementById('tcount');
+
+  function apply(f){
+    var n = 0;
+    rows.forEach(function(r){
+      var show;
+      if (f === 'all') show = true;
+      else if (f === 'active') show = r.dataset.mat === 'active';
+      else show = r.dataset.run === f;
+      r.style.display = show ? '' : 'none';
+      if (show) n++;
+    });
+    counter.textContent = n + (n === 1 ? ' shown' : ' shown');
+  }
+
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      btns.forEach(function(o){ o.setAttribute('aria-pressed', String(o === b)); });
+      apply(b.dataset.f);
+    });
+  });
+
+  /* ---------- hero spectrogram ---------- */
+  var cv = document.getElementById('spec');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+
+  // deterministic PRNG so the header is stable across reloads
+  var seed = 20260815;
+  function rnd(){ seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
+
+  function ramp(t, dark){
+    // low energy -> ground, high energy -> accent. Two-stop perceptual-ish ramp.
+    t = Math.max(0, Math.min(1, t));
+    var a = dark ? [10,17,19]   : [239,242,243];
+    var b = dark ? [24,52,58]   : [186,206,209];
+    var c = dark ? [201,126,44] : [154,82,5];
+    var d = dark ? [255,205,140]: [90,44,0];
+    var p, q, u;
+    if (t < 0.45){ p=a; q=b; u=t/0.45; }
+    else if (t < 0.8){ p=b; q=c; u=(t-0.45)/0.35; }
+    else { p=c; q=d; u=(t-0.8)/0.2; }
+    return 'rgb(' + Math.round(p[0]+(q[0]-p[0])*u) + ',' +
+                    Math.round(p[1]+(q[1]-p[1])*u) + ',' +
+                    Math.round(p[2]+(q[2]-p[2])*u) + ')';
+  }
+
+  function draw(){
+    var dark = matchMedia('(prefers-color-scheme: dark)').matches;
+    var forced = document.documentElement.getAttribute('data-theme');
+    if (forced === 'dark') dark = true;
+    if (forced === 'light') dark = false;
+
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = cv.clientWidth, h = cv.clientHeight;
+    if (!w || !h) return;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    var COLS = Math.max(120, Math.round(w / 3.2)), ROWS = 46;
+    var cw = w / COLS, ch = h / ROWS;
+
+    // synthetic "calls": frequency sweeps with harmonics
+    seed = 20260815;
+    var calls = [];
+    var n = Math.max(7, Math.round(COLS / 34));
+    for (var i = 0; i < n; i++){
+      var start = rnd() * 0.94;
+      calls.push({
+        t0: start,
+        dur: 0.02 + rnd() * 0.075,
+        f0: 0.18 + rnd() * 0.5,
+        slope: (rnd() - 0.45) * 0.42,
+        harm: 1 + Math.floor(rnd() * 3),
+        amp: 0.55 + rnd() * 0.45,
+        wob: rnd() * 5
+      });
+    }
+
+    for (var x = 0; x < COLS; x++){
+      var tx = x / COLS;
+      for (var y = 0; y < ROWS; y++){
+        var fy = 1 - y / ROWS;               // 0 bottom .. 1 top
+        var e = 0.045 + 0.05 * Math.exp(-fy * 3.4);  // noise floor, louder low
+        e += 0.03 * rnd();
+
+        for (var k = 0; k < calls.length; k++){
+          var c = calls[k];
+          if (tx < c.t0 || tx > c.t0 + c.dur) continue;
+          var u = (tx - c.t0) / c.dur;
+          var env = Math.sin(Math.PI * u);   // fade in/out
+          for (var hn = 1; hn <= c.harm; hn++){
+            var f = (c.f0 + c.slope * u + 0.012 * Math.sin(u * c.wob * 6.3)) * hn;
+            if (f > 1) continue;
+            var d = Math.abs(fy - f);
+            e += c.amp * env * Math.exp(-(d * d) / 0.00042) / hn;
+          }
+        }
+        if (e < 0.075) continue;             // leave the floor unpainted
+        ctx.fillStyle = ramp(e, dark);
+        ctx.fillRect(x * cw, y * ch, cw + 0.6, ch + 0.6);
+      }
+    }
+  }
+
+  draw();
+  var t;
+  addEventListener('resize', function(){ clearTimeout(t); t = setTimeout(draw, 160); });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+  new MutationObserver(draw).observe(document.documentElement, { attributes:true, attributeFilter:['data-theme'] });
+})();
+</script>

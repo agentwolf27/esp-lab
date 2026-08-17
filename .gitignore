@@ -1,0 +1,47 @@
+# ---- private: personal strategy, unpublished roadmap, outreach drafts ----
+PLAN.md
+IDEAS.md
+research/
+outreach/
+
+# ---- data, model weights, embeddings (regenerable; see data/README.md) ----
+data/*
+!data/README.md
+datasets/
+*.wav
+*.npy
+*.npz
+*.pt
+*.pth
+*.safetensors
+*.b64
+*.zip
+*.tar.gz
+
+# ---- environments & caches ----
+.venv/
+venv/
+.uv-cache/
+.pip-cache/
+.hf/
+.tmp/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# ---- OS / editor ----
+.DS_Store
+._*
+.Spotlight-V100
+.fseventsd
+*.log
+.vscode/
+.idea/
+
+# ---- secrets (belt and braces) ----
+.env
+.env.*
+*.pem
+*.key
+*_token*
+credentials*

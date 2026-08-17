@@ -1,0 +1,13 @@
+# python 3.12 · everything runs on CPU
+numpy>=1.26
+scipy>=1.11
+pandas>=2.0
+scikit-learn>=1.4
+matplotlib>=3.8
+soundfile>=0.12
+librosa>=0.10
+torch>=2.2
+torchaudio>=2.2
+transformers>=4.40
+opensmile>=2.5
+openpyxl>=3.1

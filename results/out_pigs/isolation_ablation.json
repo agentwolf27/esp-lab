@@ -1,0 +1,50 @@
+{
+ "all pig contexts (as before)": {
+  "acc": 0.5906731420145751,
+  "p": 0.019801980198019802,
+  "n": 5031
+ },
+ "pig WITHOUT isolation": {
+  "acc": 0.567885636293375,
+  "p": 0.0297029702970297,
+  "n": 4331
+ },
+ "pig isolation vs all positive ONLY": {
+  "acc": 0.5524171556522716,
+  "p": 0.019801980198019802,
+  "n": 2734
+ },
+ "pig negatives EXCEPT isolation vs positive": {
+  "acc": 0.567885636293375,
+  "p": 0.0297029702970297,
+  "n": 4331
+ },
+ "dog_to_cat": {
+  "acc": 0.5831663793505102,
+  "p": 0.009900990099009901
+ },
+ "cat_probe_on_pig_contexts": {
+  "AfterNursing": 0.44888023369036023,
+  "Barren": 0.7028270874424721,
+  "BeforeNursing": 0.5000000000000001,
+  "Castration": 0.6372881355932203,
+  "Crushing": 0.6417281348788199,
+  "Enriched": 0.635989010989011,
+  "Fighting": 0.4939271255060728,
+  "Huddling": 0.6320166320166319,
+  "Isolation": 0.6701098901098903,
+  "MissedNursing": 0.6034188034188034,
+  "NegativeConditioning": 0.8002585649644472,
+  "NovelObject": 0.6426426426426427,
+  "PositiveConditioning": 0.7608274078862315,
+  "Restrain": 0.7304395604395604,
+  "Reunion": 0.6419780219780219,
+  "Run": 0.6352747252747253,
+  "Surprise": 0.6696832579185521
+ },
+ "pig_probe_on_cat_contexts": {
+  "brushing (pos)": 0.44276196244700194,
+  "waiting for food (excluded)": 0.4949832775919732,
+  "isolation (neg)": 0.621301775147929
+ }
+}
