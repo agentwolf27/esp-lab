@@ -381,9 +381,13 @@ generalisation. This is a reframing, not a refutation.)
 | WavLM | 0.631 (mean 0.561) | **0.700** (mean 0.615) |
 | AVES-bio | 0.651 (mean 0.629) | 0.681 (mean 0.670) |
 
-Identity dominance is **not a domestic-animal quirk**. And a free 4× time-stretch, which folds
-ultrasonic content into the encoder's band, improves identity by +7 pts (WavLM) — a small positive
-result on ESP's own bandwidth problem (#6). No context labels in the BEANS packaging (see iteration 2).
+Identity dominance is **not a domestic-animal quirk**. And a 4× time-stretch, which folds ultrasonic
+content into the encoder's band, improves identity by +7 pts (WavLM).
+**Correction (17 Aug):** this is the *time-expansion baseline* that ESP's own multiband paper (Sarkar
+et al. 2026, arXiv 2604.27936, `earthspecies/multiband-audio`) is designed to beat — a known technique,
+not a new result. Honest framing: we reproduced the time-expansion effect on a wild species with a
+speech encoder. The natural next step is to run their heterodyne-and-fuse method on the same 2,000
+calls and see if it beats 0.700. No context labels in the BEANS packaging (see iteration 2).
 
 ## The 3×3 transfer matrix (WavLM, mean over layers, group-level permutation)
 
@@ -491,3 +495,39 @@ Honest Paper-B sentence, final form:
 > a stable cross-species code.*
 
 Figure: `figures/encoders3.png`. Data: `results/out_pigs/aves_matrix.json`, `encoder_consistency.json`.
+
+---
+
+# ITERATION 5 — channel stress test (E5): which axis survives deployment?
+
+Take the same 656 cat/dog clips, perturb the audio four ways, re-embed with WavLM, and ask probes
+trained on **clean** audio how often their decisions flip. This is the thesis question in miniature:
+deployment never matches the recording session.
+
+Layer 9, pooled cats+dogs, fraction of decisions that flip:
+
+| perturbation | context (binary) | identity, matched binary | identity, full 10–20-way | ratio (matched) |
+|---|---|---|---|---|
+| low-pass 4 kHz | **0.011** | 0.047 | 0.070 | **4.2×** |
+| reverb 0.4 s | 0.116 | 0.221 | 0.329 | 1.9× |
+| noise +10 dB SNR | 0.191 | 0.267 | 0.524 | 1.4× |
+| gain −12 dB | 0.000 | — | 0.000 | *(not informative — we z-normalise every waveform before the encoder, so gain is removed by construction)* |
+
+**The control mattered.** Raw identity is a 10–20-way task and context is binary, so identity has more
+boundaries to cross. Matching difficulty (predict which random half of the animals a clip came from,
+20 splits averaged) shrinks the effect from 2.7–6.1× to **1.4–4.2×** — but it does not remove it.
+
+**Reading.** *Context is the channel-robust axis; identity is channel-entangled* — clearly under
+bandwidth loss (context flips 1.1% when everything above 4 kHz is deleted), moderately under reverb,
+weakly and inconsistently under noise (ratio ≈1.0 at layers 3/6/12). Physically sensible: individual
+voice identity lives in fine spectral detail, affect in coarse envelope and duration.
+
+**It also pushes back on the room worry.** If the cat "context" signal were purely room acoustics,
+adding 0.4 s of reverb should scramble it. Context flips 11.6%; matched identity flips 22.1%. So the
+context axis is not simply an acoustic-environment readout — though the background-only result stands
+as a separate warning about *that particular dataset*.
+
+Caveat: probes are fit in-sample on clean audio, so these are decision-**stability** measures, not
+generalisation measures. That is the right design for counting flips; it is not an accuracy claim.
+
+Figure `figures/stress.png`; data `results/out_stress/`.
