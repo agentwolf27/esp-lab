@@ -16,6 +16,8 @@ simple baselines, and benchmarks that support the claims made from them."* Our r
 
 ## Abstract (draft, ~180 words)
 
+**[abstract needs one added sentence on the conformal result before submission]**
+
 Frozen audio encoders are now the default feature extractor for animal-vocalisation tasks, and they are
 routinely evaluated with random train/test splits. We show this measures the wrong thing. Across four
 public corpora — cat meows (21 individuals), dog barks (10), pig calls (6 recording labs) and wild
@@ -37,6 +39,9 @@ much target-group labelling repairs the gap.
 4. A published feature set falling below chance under lab shift.
 5. A channel stress test showing context is 1.4–4.2× more robust than identity.
 6. Recovery curves: ~11 target-individual clips saturate cats; 100 target-lab clips close half the pig gap.
+7. **Conformal coverage is per-group broken** (marginal 0.90, worst cat 0.41, 5/20 below 0.80),
+   the standard Mondrian-by-group remedy is *structurally unavailable* under a group-disjoint split,
+   and repair requires ≥9 labelled clips from the deployment group at α=0.10.
 
 ## Figures (all exist)
 1. `audit_table.png` — the four-corpus table
@@ -46,6 +51,7 @@ much target-group labelling repairs the gap.
 5. `room.png` — the background-only control (CatMeows room confound)
 6. `stress.png` — channel robustness, matched difficulty
 7. `recovery.png` — labelling recovery curves
+8. `coverage.png` — per-group conformal coverage vs the marginal guarantee
 
 ## Section plan
 1. **Intro** — frozen encoders + random splits are the field default; we audit that default.
@@ -54,6 +60,8 @@ much target-group labelling repairs the gap.
 4. **Corpora** — cats, dogs, pigs, bats; group = individual or lab.
 5. **Results** — the table; the inflation law with its limit; eGeMAPS>WavLM; below-chance features; the room control.
 6. **Robustness** — channel stress; recovery curves.
+6b. **It breaks the guarantees too** — conformal marginal vs per-group coverage; why Mondrian-by-group
+    is vacuous in deployment; the ≥9-clip rule; species shift collapsing even marginal coverage.
 7. **Limitations** — one encoder family dominant; bats have no decodable context; dog context confounded with session; cluster-level null; probes are linear.
 8. **Recommendations** — report identity decodability alongside every context number; split by group; publish per-group spread.
 

@@ -2,7 +2,7 @@ import json, os
 D = os.path.dirname(os.path.abspath(__file__))
 F = os.path.join(D, "out_fig")
 b = {k: open(f"{F}/{k}.png.b64").read() for k in
-     ["encoders", "layers", "transfer", "acoustics", "replication", "room", "leakage", "matrix3", "pigs", "bats", "construct", "encoders3", "stress", "shared_direction", "audit_table", "inflation_law", "recovery", "multiband"]}
+     ["encoders", "layers", "transfer", "acoustics", "replication", "room", "leakage", "matrix3", "pigs", "bats", "construct", "encoders3", "stress", "shared_direction", "audit_table", "inflation_law", "recovery", "multiband", "coverage"]}
 
 CSS = """
 :root{--bg:#EFF2F3;--surface:#FBFCFC;--surface-2:#E4EAEB;--surface-3:#DAE2E3;--ink:#0F1A1C;--ink-2:#42565A;--ink-3:#6C8084;--rule:#CBD6D8;--rule-soft:#DDE5E6;--accent:#9A5205;--cyan:#0A626D;--mag:#8A3459;--ok:#2C6349;--ok-bg:#DCEBE3;--warn:#7E5A0C;--warn-bg:#F0E7D0;--bad:#8A3459;--bad-bg:#F2DEE7;--dim:#5C6E71;--dim-bg:#E1E7E8;--shadow:0 1px 2px rgba(15,26,28,.06),0 8px 24px -16px rgba(15,26,28,.28);--mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,"Cascadia Mono",monospace;--serif:Charter,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--measure:70ch;color-scheme:light}
@@ -43,7 +43,7 @@ HTML = f"""<title>Identity, Not Context</title>
 <div class="stat bad"><b>0.79</b><span>cat identity acc</span></div>
 <div class="stat bad"><b>+0.21</b><span>split inflation, pigs</span></div>
 <div class="stat bad"><b>0.386</b><span>pig paper features, held-out lab</span></div>
-<div class="stat hi"><b>r=0.65</b><span>identity → inflation</span></div>
+<div class="stat bad"><b>0.41</b><span>worst-cat coverage (target .90)</span></div>
 </div></div></header>
 
 <nav class="jump"><div class="wrap"><ul>
@@ -162,6 +162,14 @@ HTML = f"""<title>Identity, Not Context</title>
 <div class="card"><span class="tag">The sharpest sentence in the paper</span><h3>Hand-crafted features beat the neural encoder</h3><p>On pigs, under held-out lab, <b>eGeMAPS scores 0.669 and WavLM 0.660</b> &mdash; while eGeMAPS leaks less identity (0.865 vs 0.938). The encoder&rsquo;s apparent advantage on pigs lives <em>entirely inside the leaky number</em>. If you evaluate honestly, the 88 classic acoustic descriptors win.</p></div>
 <div class="card"><span class="tag">Not everything is broken</span><h3>Dogs actually generalise</h3><p>Held-out-<em>dog</em> context accuracy is <b>0.728</b> against 0.333 chance, with a duration-only floor at 0.341 &mdash; so it is not a bout-length artifact. Caveat: ten dogs, and dog context is confounded with recording session, so this is not a leave-one-session-out number.</p></div>
 </div>
+<figure><img src="data:image/png;base64,{b['coverage']}" alt="Per-group conformal coverage"><figcaption><b>The headline number is perfect and one cat in five is 50 points short.</b> Conformal prediction at &alpha;=0.10 gives marginal coverage of 0.904 on cats, 0.892 on dogs, 0.891 on pigs &mdash; all on target. Per <em>group</em>: worst cat <b>0.412</b>, worst dog 0.624, worst pig lab 0.735; 5 of 20 cats fall below 0.80. This is not a bug &mdash; a synthetic exchangeable control returns 0.9048 over 2,000 trials, and the spread is just as wide under an exchangeable split. It is the conditional-coverage gap, shown on real bioacoustic data.</figcaption></figure>
+<div class="note bad"><h4>The obvious fix does not exist when you need it</h4><ul>
+<li><b>Mondrian by predicted class: no help.</b> Worst cat 0.412&rarr;0.425; worst dog unchanged; for pigs marginal coverage drops <em>below</em> nominal and the spread widens.</li>
+<li><b>Mondrian by group, in deployment: structurally vacuous.</b> Under a group-disjoint split no test group has calibration data, so every group falls back to pooled &mdash; verified bit-for-bit identical (0/20, 0/10, 0/6 groups get their own threshold). The textbook remedy is unavailable precisely in the deployment case.</li>
+<li><b>Mondrian by group, given some of that group&rsquo;s labels: complete repair where data allows.</b> Dogs worst 0.696&rarr;<b>0.905</b>; pigs worst 0.775&rarr;<b>0.898</b> with IQR collapsing to 0.002. But cats do not repair at all &mdash; at &alpha;=0.10 you need <b>&ge;9 labelled clips from that individual</b>, and only 6 of 20 cats have them.</li>
+<li>And the repair is paid for unevenly in set size: one dog abstains on almost everything (1.91), another emits empty sets (0.91).</li>
+</ul>
+<p><b>The practitioner rule:</b> &alpha;=0.10 needs &ge;9 labelled clips from the animal or site you deploy on; below that no per-group guarantee is purchasable at any price. That lines up with the recovery curve above, where ~11 target-cat clips saturate accuracy. <b>And the shift ladder:</b> swapping <em>individuals</em> within a species costs nothing marginally; swapping <em>species</em> (calibrate on dogs, test on cats) collapses even marginal coverage to 0.747.</p></div>
 <figure><img src="data:image/png;base64,{b['recovery']}" alt="Recovery curves"><figcaption><b>How much labelling repairs the gap &mdash; and the two shifts are different in kind.</b> About <b>11</b> labelled clips from the target cat lift WavLM from 0.576 to 0.727, which <em>is</em> the random-split ceiling: cat &ldquo;shift&rdquo; is individual idiosyncrasy that a handful of labels fully absorbs. For pigs, <b>100</b> labelled clips from the target lab close only half the gap and are still climbing. eGeMAPS recovers far less in both, so the encoder is more <em>adaptable</em> rather than more <em>transferable</em>.</figcaption></figure>
 </div></section>
 
