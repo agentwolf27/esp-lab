@@ -1,6 +1,10 @@
 # Who, Not Why: Individual and Site Identity Dominate Frozen-Encoder Evaluation of Animal Vocalisations
 
-*Draft v0.1 — 17 Aug 2026. Target: ICBINB-BIO @ NeurIPS 2026 (deadline 29 Aug, 11:59 AoE).*
+*Draft v0.2 — 17 Aug 2026. Target: ICBINB-BIO @ NeurIPS 2026.*
+*Confirmed logistics: deadline **29 Aug 2026 AoE** · **8 pages** (excl. references/appendices) ·
+**double-blind**, anonymity extends to linked material · **non-archival** · OpenReview portal open ·
+concurrent submission allowed · **LLM-use disclosure required** · template
+`\usepackage[dblblindworkshop]{neurips_2026}` with `\workshoptitle{}`, extracted to `paper/template/`.*
 *Every number in this draft traces to a JSON file in `results/`. Placeholders are marked ⟨⟩.*
 
 ---
@@ -27,6 +31,11 @@ failure and recommend reporting identity decodability alongside every context re
 
 ## 1. Introduction
 
+*(Framing note for this venue: the ICBINB-BIO committee is drawn from molecular, genomics and
+clinical ML rather than bioacoustics. The analogue to keep in mind throughout is the COVID-radiograph
+shortcut [DeGrave2021] and the EEG identity trap [Lin2026]: a model that reads the acquisition site
+instead of the biology, scored by a metric that cannot tell the difference.)*
+
 Two conventions have become standard in computational bioacoustics. First, use a large pretrained
 audio encoder — BirdNET, Perch, AVES, BEATs, or a speech model such as WavLM — frozen, as a feature
 extractor. Second, evaluate the resulting classifier on a random split of the available clips.
@@ -38,6 +47,13 @@ recorded minutes apart in the same room, on both sides of the train/test boundar
 represents *who is calling* and *where the recording was made* — and we show it represents both very
 strongly — then a random-split evaluation rewards recognising the animal, and reports the result as
 understanding of the animal's behaviour.
+
+That identity confounding inflates evaluation is not a new warning. It was named and formalised for
+biomedical data by Chaibub Neto et al. [ChaibubNeto2019], measured for audio by Han et al. [Han2022],
+and recommended against in bioacoustics specifically by Colonna et al. [Colonna2016] and by Ghani,
+Baier, Kalkman & Stowell [Ghani2026]. **What is missing is a measurement of what the warning is worth
+in this field** — how large the inflation actually is, across which corpora and feature sets, and what
+it costs the conclusions people draw. That is what we supply.
 
 We audit this directly. Our protocol replaces the random split with a held-out-group split (leave one
 individual out, or leave one recording lab out) and reports three numbers side by side for every
@@ -62,10 +78,37 @@ first two.
 
 ## 2. Related work
 
-⟨To be completed from `RELATED_WORK.md` — verification agent running. Must include: the mature
-speaker-independence literature in speech emotion recognition; shortcut learning / dataset bias;
-BEANS and BirdSet evaluation conventions; prior critiques of the specific corpora; and conformal
-prediction in audio.⟩
+**Identity confounding is a known failure mode — outside bioacoustics.** Saeb et al. [Saeb2017] and
+Chaibub Neto et al. [ChaibubNeto2019] formalised it for digital-health data, showing that
+record-wise cross-validation inflates accuracy when subjects recur across folds. The pattern recurs
+wherever data is collected from few subjects: Han et al. [Han2022] measure it for audio-based health
+screening, and Lin et al. [Lin2026] document an "identity trap" in EEG, where subject identity is
+decodable far above the task label. Our contribution is to measure the size of this effect in
+computational bioacoustics, where the convention persists.
+
+**Shortcut learning.** The broader framing is Geirhos et al. [Geirhos2020]; the canonical
+demonstration in a scientific setting is DeGrave, Janizek & Lee [DeGrave2021], who showed COVID-19
+radiograph classifiers reading laterality markers and hospital source rather than pathology. Kapoor &
+Narayanan [Kapoor2023] document leakage as a reproducibility crisis across scientific ML. Our result
+is the bioacoustic instance of the same disease: the model reads *who and where*, and the metric
+rewards it.
+
+**Bioacoustic evaluation practice.** Colonna et al. [Colonna2016] recommended individual-disjoint
+splits for anuran calls; Ghani, Baier, Kalkman & Stowell [Ghani2026] repeat the recommendation as
+field guidance. Stowell et al. [Stowell2019] used adversarial background mixing to show environmental
+confounding in bird classifiers. Benchmarks in current use — BEANS [Hagiwara2023] and the encoders
+evaluated on them, including AVES [Hagiwara2023a] and AVEX [Miron2026] — largely retain random or
+pre-specified splits, and Schwinger et al. [Schwinger2026] show calibration itself varies sharply
+across datasets. Notably, the ingredients of our claim already appear unremarked in published tables:
+Abzaliev et al. [Abzaliev2024] report dog individual-ID at 0.50 against 0.05 chance alongside context
+classification at 0.62 against a 0.56 baseline, without commenting on the disparity.
+
+**Conformal prediction.** Vovk et al. and Angelopoulos & Bates give the framework; Barber et al.
+[Barber2021] prove that exact conditional coverage is unattainable in general, and Ding et al.
+[Ding2023] give the class-conditional sample-size bound (1/α)−1 that we instantiate empirically in §6.
+We found no prior application of conformal prediction to bioacoustics or passive acoustic monitoring
+(verified by exhaustive arXiv and OpenAlex sweeps), which makes §6 the first such measurement rather
+than a new method.
 
 ---
 
@@ -109,15 +152,24 @@ holds in all six encoder clusters (sign test *p*=0.031), and is not a dimensiona
 (*r*=0.509), as the leakage account requires.
 
 **The limit.** Across the 12 genuinely independent dataset×feature-set units the correlation is
-*r*=0.221 (*p*=0.489). We therefore claim only: *among feature sets and layers for a given dataset,
-the one that leaks less identity inflates less.* We do not claim that corpora with more identity
-leakage inflate more.
+*r*=0.221 (*p*=0.489). At *n*=12 this test has roughly 15% power for an effect of the pooled size, so
+the honest statement is that **we do not detect** a cross-corpus relationship, not that none exists.
+We therefore claim only: *among feature sets and layers for a given dataset, the one that leaks less
+identity inflates less.*
 
 ### 4.3 An unexpectedly strong simple baseline
 
-On pig valence under held-out-lab evaluation, eGeMAPS scores **0.669** and WavLM **0.660** (best layer; mean over layers 0.604), while
-eGeMAPS leaks less identity (0.865 vs 0.938). Under a random split WavLM appears clearly ahead
-(0.883 vs 0.823). The encoder's advantage on this dataset exists only in the leaky number.
+On pig valence under held-out-lab evaluation, eGeMAPS scores **0.669** and WavLM **0.660** (best
+layer; WavLM mean over layers 0.604), while eGeMAPS leaks less identity (0.865 vs 0.938). Under a
+random split WavLM appears clearly ahead (0.883 vs 0.823).
+
+We state this carefully: 0.9 points across four held-out labs is **not** a significant win for
+eGeMAPS, and we do not claim one. The defensible claim is that **the encoder's apparent advantage
+disappears under honest evaluation while its identity leakage does not** — a 6-point random-split lead
+becomes a statistical tie, and the cheaper, more interpretable feature set is the one leaking less.
+The comparison also runs the other way in adjacent literature: Tang et al. [Tang2023] find SSL
+representations ahead of eGeMAPS in cross-language speech emotion recognition, so this is a
+domain-specific observation, not a general claim about feature families.
 
 Separately, the 18 acoustic features published with the pig corpus score **0.386** under held-out-lab
 evaluation — below the 0.500 chance level — indicating that the feature-to-valence mapping partly
@@ -127,11 +179,22 @@ different protocol, not a refutation of their result.⟩
 
 ### 4.4 The label can be predicted from the background
 
+Using the parts of a recording that are *not* the vocalisation to expose environmental confounding
+has precedent: Stowell et al. [Stowell2019] mixed held-out background segments adversarially to show
+that bird-species classifiers were partly reading the environment. We apply the idea differently —
+probing **behavioural context** directly from background frames rather than testing identity
+robustness under mixing — and on a corpus where the confound is structural.
+
 CatMeows induces its isolation condition by moving the cat to an unfamiliar room. Discarding the
 vocalisation and keeping only the quietest 30% of frames still yields 0.725 on the binary task —
 approximately the full-embedding number. A reverberation proxy separates the classes at +0.10/−0.18 SD
 (cats) and +0.67/−0.32 SD (dogs). Part of what is called context classification on this corpus is room
 classification.
+
+The corpus documentation contains both halves of the problem. The protocol states that for the
+isolation condition cats were transferred to *"a room in a different apartment or an office"*; the
+methods section states that room characteristics *"should not affect the captured audio signals."*
+Our background-only probe indicates the second statement does not hold for a modern encoder.
 
 ---
 
@@ -166,8 +229,15 @@ returns 0.9048 over 2,000 trials, and the per-group spread is equally wide under
 identical to pooled under a group-disjoint split, because no test group has calibration data (verified:
 0/20, 0/10, 0/6 groups receive their own threshold). Conditioning on predicted class does not help
 (worst cat 0.412→0.425). Given some of the deployment group's own labels, repair is complete where
-data allows (dogs 0.696→0.905; pigs 0.775→0.898, IQR→0.002) but requires **≥9 labelled clips at
-α=0.10**, which only 6 of 20 cats possess.
+data allows (dogs 0.696→0.905; pigs 0.775→0.898, IQR→0.002) but requires at least ⌈1/α⌉−1 = **9
+labelled clips** from that group, which only 6 of 20 cats possess.
+
+**This threshold is a theorem, not our finding.** Ding et al. [Ding2023] show that for any group *y*
+with fewer than (1/α)−1 calibration points the class-conditional quantile is infinite, so the
+prediction set is trivially everything. Mondrian vacuity under a group-disjoint split is then a
+one-line corollary: zero calibration points is less than nine. Our contribution here is not the bound
+but the **measurement of how often bioacoustic corpora fall below it** — 14 of 20 cats do — and the
+demonstration that the resulting marginal coverage still looks perfectly on-target.
 
 **Shift.** Calibrating on dogs and testing on cats collapses even marginal coverage to 0.747 (L9) and
 0.556 (L6). Swapping individuals within a species costs nothing marginally; swapping species costs
@@ -232,7 +302,9 @@ threshold for a per-group guarantee, from an entirely different direction.
 
 ## Reproducibility
 
-All code, cached results and figures: `github.com/agentwolf27/esp-lab`. Every experiment runs on a
+⚠️ **Submission is double-blind and anonymity extends to linked material.** For the submitted version
+this section must point to an anonymised mirror (e.g. anonymous.4open.science), not the public repo.
+De-anonymised version: `github.com/agentwolf27/esp-lab`. Every experiment runs on a
 CPU laptop; total compute cost for the paper is zero GPU-hours. Datasets are public: CatMeows
 (Zenodo 4008297, CC-BY-4.0), dog barks (Molnár et al. 2008, via BEANS), Soundwel (Zenodo 8252482,
 CC-BY-4.0), Egyptian fruit bats (Prat et al. 2017, via BEANS).
