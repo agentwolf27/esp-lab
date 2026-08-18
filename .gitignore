@@ -45,3 +45,6 @@ __pycache__/
 *.key
 *_token*
 credentials*
+
+# private: novelty/competitive analysis — strategy, not results
+paper/RELATED_WORK.md
