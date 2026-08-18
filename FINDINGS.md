@@ -785,3 +785,66 @@ It supplies the "so what". The paper no longer just says *your accuracy is infla
 **your uncertainty guarantee is also per-group broken, the standard remedy is unavailable in
 deployment, and here is the labelling threshold at which it becomes available.** That is a concrete,
 actionable failure mode — exactly the ICBINB-BIO genre.
+
+---
+
+# ITERATION 12 — Phase 1 of the encoder plan: identity is removable, site identity is not
+
+Two cheap experiments on cached embeddings (numpy/sklearn, no GPU, no retraining), testing the core
+premise of `paper/ENCODER_PLAN.md`: *the information is there, it is just dominated by nuisance.*
+
+## 1a. Fusion — eGeMAPS + WavLM beats either, slightly
+
+Pigs (held-out lab): WavLM 0.654, eGeMAPS 0.641, **fused 0.668 (+0.014 over the better one)**.
+So the two feature families do make partly different errors, but the gain is small — consistent with
+them encoding largely the same thing. Cats/dogs skipped: the audit's eGeMAPS arrays cover all 440
+meows while the cross-species subset is the 348 brushing/isolation clips. *(To fix: re-index rather
+than recompute.)*
+
+## 1b. Identity-subspace removal (INLP) — the headline
+
+Estimate identity directions with iterative nullspace projection on **training groups only**, project
+them out, re-run the honest context probe. Report both numbers plus a random-direction control of
+equal rank.
+
+| | identity before | identity after (rank 32) | Δ identity | context before | context after | Δ context |
+|---|---|---|---|---|---|---|
+| **cats** (20 individuals) | 0.721 | **0.256** | **−0.465** | 0.782 | 0.780 | −0.002 |
+| **dogs** (10 individuals) | 0.753 | **0.208** | **−0.545** | 0.846 | 0.849 | +0.003 |
+| **pigs** (6 **labs**) | 0.941 | 0.828 | −0.113 | 0.654 | 0.662 | +0.008 |
+
+At the context-optimal rank: cats rank 8 → identity −0.244 with context **+0.013**; dogs rank 2 →
+identity −0.114 with context +0.010.
+
+**The random-direction control is the important one.** Projecting out the same number of *random*
+directions leaves identity untouched (cats 0.721 → 0.724; dogs 0.753 → 0.747; pigs 0.941 → 0.940).
+So INLP is removing something specific, not merely shrinking the representation. This is the control
+that separates invariance from compression, and it passes.
+
+## The three-way contrast IS the finding
+
+- **Individual identity is a low-rank, removable subspace.** Eight directions out of 768 carry a
+  quarter of cat identity; thirty-two carry more than half of dog identity — and context is
+  completely unharmed, sometimes marginally better.
+- **Recording-site identity is not.** Thirty-two directions remove only 11 points of pig *lab*
+  identity, which starts at 0.941 and stays at 0.828. Lab identity is distributed across the
+  representation, not concentrated in a subspace.
+
+That distinction is mechanistically sensible — individual voice is a property of one animal's vocal
+apparatus, while a lab is channel plus room plus population plus equipment, which touches everything.
+
+**And it independently reproduces the recovery-curve result.** In the audit, ~11 labelled clips from
+a target cat closed the individual gap completely, while 100 clips from a target pig lab closed only
+half. Two unrelated methods — labelling curves and subspace geometry — arrive at the same structural
+claim: *individual shift is simple and cheap to fix; site shift is deep and neither labels nor linear
+projection dispatch it.*
+
+## What this licenses, and what it does not
+
+It licenses a practical tool: an identity-invariant projection for individual-level nuisance, free,
+post-hoc, on any frozen encoder, with the honest evaluation protocol attached. It does **not** license
+a claim about site invariance — linear projection fails there, and the next thing to try is a
+nonlinear or adversarial method, which needs training and therefore a GPU.
+
+Figure `figures/invariance.png`; data `results/out_invariance/results.json`; code
+`experiments/encoder/phase1_invariance.py`.
