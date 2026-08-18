@@ -1,0 +1,127 @@
+{
+  "n_calls": 70001,
+  "n_emitters": 54,
+  "n_directed_pairs": 481,
+  "results": [
+    {
+      "top50_jaccard": 1.0,
+      "edge_weight_spearman": 0.7041839965576647,
+      "out_degree_spearman": 0.9990470389205257,
+      "spurious_edges_ge_strong": 0,
+      "spurious_edges_ge_20": 0,
+      "nominal_accuracy": 0.95,
+      "realised_accuracy": 0.9493435808059885,
+      "error_structure": "uniform"
+    },
+    {
+      "top50_jaccard": 1.0,
+      "edge_weight_spearman": 0.8246820107304141,
+      "out_degree_spearman": 0.9991232758650044,
+      "spurious_edges_ge_strong": 1,
+      "spurious_edges_ge_20": 23,
+      "nominal_accuracy": 0.95,
+      "realised_accuracy": 0.9493435808059885,
+      "error_structure": "microphone-structured"
+    },
+    {
+      "top50_jaccard": 1.0,
+      "edge_weight_spearman": 0.5879540299423611,
+      "out_degree_spearman": 0.998970801976047,
+      "spurious_edges_ge_strong": 0,
+      "spurious_edges_ge_20": 4,
+      "nominal_accuracy": 0.9,
+      "realised_accuracy": 0.9014014085513065,
+      "error_structure": "uniform"
+    },
+    {
+      "top50_jaccard": 1.0,
+      "edge_weight_spearman": 0.7513360593689552,
+      "out_degree_spearman": 0.99767477391991,
+      "spurious_edges_ge_strong": 5,
+      "spurious_edges_ge_20": 47,
+      "nominal_accuracy": 0.9,
+      "realised_accuracy": 0.9014014085513065,
+      "error_structure": "microphone-structured"
+    },
+    {
+      "top50_jaccard": 0.9230769230769231,
+      "edge_weight_spearman": 0.48571966189334864,
+      "out_degree_spearman": 0.9971411153085593,
+      "spurious_edges_ge_strong": 0,
+      "spurious_edges_ge_20": 148,
+      "nominal_accuracy": 0.8,
+      "realised_accuracy": 0.7968886158769161,
+      "error_structure": "uniform"
+    },
+    {
+      "top50_jaccard": 0.9230769230769231,
+      "edge_weight_spearman": 0.653340802331142,
+      "out_degree_spearman": 0.9944728222518064,
+      "spurious_edges_ge_strong": 17,
+      "spurious_edges_ge_20": 79,
+      "nominal_accuracy": 0.8,
+      "realised_accuracy": 0.7968886158769161,
+      "error_structure": "microphone-structured"
+    },
+    {
+      "top50_jaccard": 1.0,
+      "edge_weight_spearman": 0.42486234715875,
+      "out_degree_spearman": 0.9909085712818183,
+      "spurious_edges_ge_strong": 0,
+      "spurious_edges_ge_20": 282,
+      "nominal_accuracy": 0.7,
+      "realised_accuracy": 0.7015756917758318,
+      "error_structure": "uniform"
+    },
+    {
+      "top50_jaccard": 0.8867924528301887,
+      "edge_weight_spearman": 0.5849926327141179,
+      "out_degree_spearman": 0.9905085011389164,
+      "spurious_edges_ge_strong": 28,
+      "spurious_edges_ge_20": 100,
+      "nominal_accuracy": 0.7,
+      "realised_accuracy": 0.7015756917758318,
+      "error_structure": "microphone-structured"
+    },
+    {
+      "top50_jaccard": 0.9230769230769231,
+      "edge_weight_spearman": 0.372852259945402,
+      "out_degree_spearman": 0.9854760318191509,
+      "spurious_edges_ge_strong": 0,
+      "spurious_edges_ge_20": 379,
+      "nominal_accuracy": 0.6,
+      "realised_accuracy": 0.599148583591663,
+      "error_structure": "uniform"
+    },
+    {
+      "top50_jaccard": 0.7543859649122807,
+      "edge_weight_spearman": 0.5296733398223405,
+      "out_degree_spearman": 0.9879922235352421,
+      "spurious_edges_ge_strong": 39,
+      "spurious_edges_ge_20": 118,
+      "nominal_accuracy": 0.6,
+      "realised_accuracy": 0.599148583591663,
+      "error_structure": "microphone-structured"
+    },
+    {
+      "top50_jaccard": 0.9607843137254902,
+      "edge_weight_spearman": 0.32771207387803947,
+      "out_degree_spearman": 0.9910991672755252,
+      "spurious_edges_ge_strong": 0,
+      "spurious_edges_ge_20": 494,
+      "nominal_accuracy": 0.5,
+      "realised_accuracy": 0.4990642990814417,
+      "error_structure": "uniform"
+    },
+    {
+      "top50_jaccard": 0.5625,
+      "edge_weight_spearman": 0.4826587343914665,
+      "out_degree_spearman": 0.9820080818295465,
+      "spurious_edges_ge_strong": 48,
+      "spurious_edges_ge_20": 131,
+      "nominal_accuracy": 0.5,
+      "realised_accuracy": 0.4990642990814417,
+      "error_structure": "microphone-structured"
+    }
+  ]
+}
