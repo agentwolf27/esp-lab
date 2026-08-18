@@ -990,3 +990,80 @@ small and covariance-relative rather than a shared direction.
 Fifth instance of the pattern: the no-pitch baseline beats every pitch-based elaboration.
 
 Data `results/out_allometry/`; code `experiments/allometry/`.
+
+---
+
+# ITERATION 15 — CORRECTION: site identity *is* low-rank. I was wrong.
+
+Iterations 12–13 claimed **"individual identity is a low-rank removable subspace; recording-site
+identity is not."** The second half is **false**, and it was published here, in two commit messages,
+and in both repositories. Correcting it in full.
+
+## What is actually true
+
+**LEACE** (Belrose et al., least-squares concept erasure) drives 6-way lab decodability from **0.941
+to 0.291 — the majority-class floor — at rank 5**, in closed form. Five is exactly *#labs − 1*. Site
+identity is not merely low-rank; it sits in the smallest subspace it possibly could.
+
+INLP stalled at 0.82 for a conceptual reason, not a capacity one. **INLP removes the max-likelihood
+*discriminative* direction; the condition for a linear probe to fail is *equal class means*, and only
+LEACE targets that.** The agent also checked the obvious bug hypothesis — our `inlp_directions`
+projects a z-space coefficient out of un-scaled space, so the correct direction is `w/σ` — and fixing
+it changes nothing (0.934 vs 0.925 at rank 5). The method was wrong, not the implementation.
+
+| method | rank | valence (held-out lab) | lab, linear probe | lab, MLP probe |
+|---|---|---|---|---|
+| raw | – | 0.654 | 0.941 | 0.949 |
+| INLP | 32 | 0.665 | 0.903 | – |
+| **LEACE** | **5** | 0.657 | **0.291** (floor) | **0.918** |
+| CORAL | – | 0.651 | 0.291 | **0.694** |
+| per-lab z-score *(transductive)* | – | **0.506** | 0.291 | 0.970 |
+
+## The finding underneath the correction
+
+**The leak is second-order.** After LEACE drives *linear* lab decodability to the floor, an **MLP
+still reads the lab at 0.918**. Lab covariances differ from pooled by 59–115% in Frobenius norm.
+INLP, LEACE, NAP and WCCN are all first-order methods and are blind to this *by construction*.
+
+That also **explains the DANN failure from iteration 13 without appealing to optimisation pathology**
+— the information genuinely remains, in second-order structure no first-order surgery touches.
+
+The one second-order method that does reach it, CORAL, takes the task with it: MLP lab 0.949 → 0.694,
+but valence collapses to 0.516. Compression, not invariance. Erasing in a 1024-dim random-Fourier
+space reproduces the same pattern one level up.
+
+**No method improved valence** under a paired cluster bootstrap. The only significant effect in the
+whole study is that per-lab z-scoring is significantly *harmful* (−0.123, CI [−0.199, −0.056]).
+
+## A caveat that lands on Paper A
+
+**On Soundwel, the lab name alone predicts valence at 0.766 — higher than the 0.654 the embedding
+earns honestly.** IASPB is 100% positive and IASPC 100% negative by construction. And
+leave-one-*context*-out scores 0.569, *worse* than leave-one-lab-out's 0.654, with zero contexts
+shared across all six labs.
+
+So **leave-one-lab-out on this corpus conflates site shift with label-distribution shift and context
+novelty.** Our pig numbers stand as measured, but the interpretation must be hedged: they are not a
+clean site-shift measurement, and the eGeMAPS-vs-WavLM comparison inherits that. The evaluation is
+also underpowered — only 4 of 6 labs are scorable, baseline 95% CI [0.526, 0.725].
+
+## Two protocol traps, one of which infected our earlier numbers
+
+1. **Fitting the eraser on all data and then probing out-of-fold gives LEACE 0.10 — *below* the 0.167
+   chance level.** That is a fold-anticorrelation artifact, and it is the protocol our earlier INLP
+   numbers used. Erasers must be re-fit inside each fold.
+2. NAP-2's apparent +0.030 win is an artifact of pooling the two single-class labs; on the 4 scorable
+   labs it is **−0.015**.
+
+Also recorded: projecting *onto* the 5-d site subspace scored 0.718 and looked exciting, but a random
+5-d subspace reaches 0.714. Not a finding.
+
+## Revised position
+
+Individual nuisance: removable, cheaply, first-order. Site nuisance: **linearly removable at rank
+#labs−1, but the information survives in second-order structure**, and every method that reaches it
+destroys the task. The honest conclusion is that this is a **study-design and encoder-training
+problem** — record shared contexts across sites, or use a second-order-aware training objective — not
+something representation surgery fixes after the fact.
+
+Data `results/out_site/`; code `experiments/site/`.

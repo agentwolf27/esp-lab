@@ -260,7 +260,12 @@ WavLM's $+$0.115: the encoder is more \emph{adaptable}, not more \emph{transfera
 One encoder family dominates; AVES is the only bioacoustic encoder tested at scale. Bats have no
 decodable context label (0.301 vs.\ 0.250 chance) and are excluded from the inflation fit. Dog context
 is confounded with recording session, so our dog numbers are leave-one-individual-out, not
-leave-one-session-out. The cross-corpus correlation is underpowered ($n{=}12$). Probes are linear and
+leave-one-session-out. \textbf{The pig corpus confounds site with label distribution by design}: two
+of six labs contribute a single valence class, the lab identifier alone predicts valence at 0.766 ---
+above the 0.654 an encoder earns honestly --- and no behavioural context is shared across all six
+labs, so leave-one-lab-out there conflates site shift with label-distribution shift and context
+novelty. Only four labs are scorable and the baseline 95\% CI is [0.526, 0.725]. The pig numbers,
+including the eGeMAPS comparison, should be read with that caveat. The cross-corpus correlation is underpowered ($n{=}12$). Probes are linear and
 best layers are selected post hoc; we report selection-free means alongside. Extreme per-group
 conformal minima come partly from small groups: restricted to cats with $n\geq10$ the worst is 0.748
 and 3/15 fall below 0.80.

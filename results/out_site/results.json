@@ -1,0 +1,443 @@
+{
+ "setup": {
+  "n": 5031,
+  "dim": 768,
+  "layer": 0,
+  "labs": [
+   "ETHZ",
+   "FBN",
+   "IASPA",
+   "IASPB",
+   "IASPC",
+   "NMBU"
+  ],
+  "lab_counts": {
+   "ETHZ": 354,
+   "FBN": 884,
+   "IASPA": 1466,
+   "IASPB": 522,
+   "IASPC": 424,
+   "NMBU": 1381
+  },
+  "lab_chance_balanced": 0.16666666666666666,
+  "lab_majority_raw": 0.291393361160803,
+  "valence_chance": 0.5
+ },
+ "diagnostics": {
+  "per_lab_neg_rate": {
+   "ETHZ": 0.3220338983050847,
+   "FBN": 0.8653846153846154,
+   "IASPA": 0.7564802182810368,
+   "IASPB": 0.0,
+   "IASPC": 1.0,
+   "NMBU": 0.4236060825488776
+  },
+  "global_neg_rate": 0.5957066189624329,
+  "valence_from_lab_alone_bacc": 0.766372567257523,
+  "contexts_per_lab": {
+   "ETHZ": [
+    "Enriched",
+    "Isolation"
+   ],
+   "FBN": [
+    "Isolation",
+    "NegativeConditioning",
+    "NovelObject",
+    "PositiveConditioning",
+    "Restrain"
+   ],
+   "IASPA": [
+    "AfterNursing",
+    "BeforeNursing",
+    "Castration",
+    "Crushing",
+    "Fighting",
+    "Huddling",
+    "Isolation",
+    "MissedNursing",
+    "Restrain",
+    "Reunion",
+    "Surprise"
+   ],
+   "IASPB": [
+    "Reunion"
+   ],
+   "IASPC": [
+    "Castration",
+    "Restrain"
+   ],
+   "NMBU": [
+    "Barren",
+    "Enriched",
+    "Run"
+   ]
+  },
+  "n_contexts_shared_by_all_labs": 0,
+  "mean_shift_norm": {
+   "ETHZ": 1.490090012550354,
+   "FBN": 1.5089977979660034,
+   "IASPA": 0.8032085299491882,
+   "IASPB": 1.3290444612503052,
+   "IASPC": 1.2360730171203613,
+   "NMBU": 1.0439057350158691
+  },
+  "within_lab_sd_mean": 0.07859072834253311,
+  "heldout_mean_shift_captured_by_train_span": {
+   "ETHZ": 0.7347230315208435,
+   "FBN": 0.7796022891998291,
+   "IASPA": 0.7057861089706421,
+   "IASPB": 0.5858356356620789,
+   "IASPC": 0.6179784536361694,
+   "NMBU": 0.6213048100471497
+  },
+  "heldout_mean_shift_captured_mean": 0.6742050548394521,
+  "cov_rel_frobenius_vs_pooled": {
+   "ETHZ": 0.8356821645532387,
+   "FBN": 0.7729631290772513,
+   "IASPA": 0.5905997761433041,
+   "IASPB": 1.1523256875577659,
+   "IASPC": 0.7857240975700492,
+   "NMBU": 0.765509057027468
+  },
+  "per_dim_sd_ratio_max_over_min": 1.8844760656356812
+ },
+ "reference": {
+  "valence_random5fold_leaky": 0.8832180262858729,
+  "valence_within_lab_cv": {
+   "ETHZ": 0.7917763157894737,
+   "FBN": 0.7467787114845938,
+   "IASPA": 0.9048679886742794,
+   "NMBU": 0.8820212171970966
+  },
+  "valence_within_lab_cv_mean": 0.8313610582863609
+ },
+ "methods": {
+  "raw": {
+   "rank": 0,
+   "transductive": false,
+   "valence_loto": 0.6537141861625637,
+   "lab_acc": 0.9405684754521964,
+   "lab_bacc": 0.9315406598253301,
+   "lab_acc_insample": 0.9405684754521964,
+   "lab_bacc_insample": 0.9315406598253301,
+   "lab_quad": 0.9461339693897833,
+   "lab_quad_bacc": 0.9380217469888793,
+   "lab_mlp": 0.9489167163585768,
+   "lab_mlp_bacc": 0.9398622310967445,
+   "lab_rff": 0.9123434704830053,
+   "lab_rff_bacc": 0.8882665470792235,
+   "secs": 0.0
+  },
+  "rand-5": {
+   "rank": 5,
+   "transductive": false,
+   "valence_loto": 0.6541356991209499,
+   "lab_acc": 0.9401709401709402,
+   "lab_bacc": 0.9317182550258479,
+   "lab_acc_insample": 0.9401709401709402,
+   "lab_bacc_insample": 0.9317182550258479,
+   "lab_quad": 0.943549990061618,
+   "lab_quad_bacc": 0.9369788395154038,
+   "lab_mlp": 0.9489167163585768,
+   "lab_mlp_bacc": 0.9411141439469328,
+   "lab_rff": 0.9129397734048896,
+   "lab_rff_bacc": 0.8904744256457753,
+   "secs": 0.0
+  },
+  "rand-32": {
+   "rank": 32,
+   "transductive": false,
+   "valence_loto": 0.6501147164863978,
+   "lab_acc": 0.939773404889684,
+   "lab_bacc": 0.9308180024620617,
+   "lab_acc_insample": 0.939773404889684,
+   "lab_bacc_insample": 0.9308180024620617,
+   "secs": 0.0
+  },
+  "rand-128": {
+   "rank": 128,
+   "transductive": false,
+   "valence_loto": 0.6521787273999664,
+   "lab_acc": 0.939773404889684,
+   "lab_bacc": 0.9308192696350801,
+   "lab_acc_insample": 0.939773404889684,
+   "lab_bacc_insample": 0.9308192696350801,
+   "secs": 0.0
+  },
+  "rand-384": {
+   "rank": 384,
+   "transductive": false,
+   "valence_loto": 0.6825018233572806,
+   "lab_acc": 0.9348042138739813,
+   "lab_bacc": 0.9249710077183919,
+   "lab_acc_insample": 0.9348042138739813,
+   "lab_bacc_insample": 0.9249710077183919,
+   "secs": 0.0
+  },
+  "INLP-orig-5": {
+   "rank": 5,
+   "transductive": false,
+   "valence_loto": 0.6653467626918954,
+   "lab_acc": 0.9252633671238323,
+   "lab_bacc": 0.9132564768439413,
+   "lab_acc_insample": 0.8884913536076327,
+   "lab_bacc_insample": 0.8760760402032778,
+   "secs": 0.0
+  },
+  "INLP-orig-32": {
+   "rank": 32,
+   "transductive": false,
+   "valence_loto": 0.6653984367848675,
+   "lab_acc": 0.9032001590141125,
+   "lab_bacc": 0.890966675840745,
+   "lab_acc_insample": 0.8187239117471675,
+   "lab_bacc_insample": 0.7935015459521301,
+   "secs": 0.0
+  },
+  "LEACE": {
+   "rank": 5,
+   "transductive": false,
+   "valence_loto": 0.6570781696150427,
+   "lab_acc": 0.291393361160803,
+   "lab_bacc": 0.16666666666666666,
+   "lab_acc_insample": 0.09540846750149076,
+   "lab_bacc_insample": 0.05808859367145702,
+   "lab_quad": 0.9061816736235341,
+   "lab_quad_bacc": 0.8945531612652479,
+   "lab_mlp": 0.9177101967799642,
+   "lab_mlp_bacc": 0.8930307135320815,
+   "lab_rff": 0.7718147485589346,
+   "lab_rff_bacc": 0.6914142565540451,
+   "secs": 0.0
+  },
+  "cLEACE": {
+   "error": "ValueError: matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size 4024 is different from 1)",
+   "rank": 5,
+   "transductive": false,
+   "valence_loto": 0.6731406923147336,
+   "lab_acc": 0.3462532299741602,
+   "lab_bacc": 0.21568545562154753,
+   "lab_acc_insample": 0.14728682170542637,
+   "lab_bacc_insample": 0.09087737683328077,
+   "lab_quad": 0.9091631882329557,
+   "lab_quad_bacc": 0.8963151215515399,
+   "lab_mlp": 0.9278473464519976,
+   "lab_mlp_bacc": 0.9150176225355806,
+   "lab_rff": 0.780162989465315,
+   "lab_rff_bacc": 0.7056504858544228,
+   "secs": 0.0
+  },
+  "NAP-5": {
+   "rank": 5,
+   "transductive": false,
+   "valence_loto": 0.6560158979038035,
+   "lab_acc": 0.291393361160803,
+   "lab_bacc": 0.16666666666666666,
+   "lab_acc_insample": 0.0932220234545816,
+   "lab_bacc_insample": 0.05659849315556609,
+   "lab_quad": 0.8896839594514013,
+   "lab_quad_bacc": 0.8747845962763403,
+   "lab_mlp": 0.9185052673424766,
+   "lab_mlp_bacc": 0.8964498721091338,
+   "lab_rff": 0.7322599880739415,
+   "lab_rff_bacc": 0.6352741746899433,
+   "secs": 0.0
+  },
+  "NAP-2": {
+   "rank": 2,
+   "transductive": false,
+   "valence_loto": 0.6836401298053216,
+   "lab_acc": 0.7724110514808189,
+   "lab_bacc": 0.8052775345196691,
+   "lab_acc_insample": 0.7189425561518584,
+   "lab_bacc_insample": 0.7646005758717017,
+   "secs": 0.0
+  },
+  "WCCN+NAP-5": {
+   "rank": 5,
+   "transductive": false,
+   "valence_loto": 0.6615649572876712,
+   "lab_acc": 0.291393361160803,
+   "lab_bacc": 0.16666666666666666,
+   "lab_acc_insample": 0.09560723514211886,
+   "lab_bacc_insample": 0.05800473435729723,
+   "secs": 19.5,
+   "lab_quad": 0.9063804412641622,
+   "lab_quad_bacc": 0.8944542550896554,
+   "lab_mlp": 0.9145299145299145,
+   "lab_mlp_bacc": 0.8919930696905659,
+   "lab_rff": 0.7720135161995627,
+   "lab_rff_bacc": 0.69213563351803
+  },
+  "WCCN": {
+   "rank": 0,
+   "transductive": false,
+   "valence_loto": 0.6278904273004569,
+   "lab_acc": 0.9355992844364938,
+   "lab_bacc": 0.9270464862521933,
+   "lab_acc_insample": 0.9566686543430729,
+   "lab_bacc_insample": 0.9463659233369318,
+   "secs": 0.0
+  },
+  "LEACE-T": {
+   "rank": 5,
+   "transductive": true,
+   "valence_loto": 0.5473666882221455,
+   "lab_acc": 0.09540846750149076,
+   "lab_bacc": 0.05808859367145702,
+   "lab_acc_insample": 0.09540846750149076,
+   "lab_bacc_insample": 0.05808859367145702,
+   "lab_quad": 0.9224806201550387,
+   "lab_quad_bacc": 0.9120830887728552,
+   "lab_mlp": 0.9334128403895846,
+   "lab_mlp_bacc": 0.9131024841776103,
+   "lab_rff": 0.7787716159809183,
+   "lab_rff_bacc": 0.6969177575170015,
+   "secs": 0.0
+  },
+  "NAP-5-T": {
+   "rank": 5,
+   "transductive": true,
+   "valence_loto": 0.5518180422310216,
+   "lab_acc": 0.0932220234545816,
+   "lab_bacc": 0.05659849315556609,
+   "lab_acc_insample": 0.0932220234545816,
+   "lab_bacc_insample": 0.05659849315556609,
+   "secs": 0.0
+  },
+  "per-lab center": {
+   "rank": 0,
+   "transductive": true,
+   "valence_loto": 0.5372525918248632,
+   "lab_acc": 0.291393361160803,
+   "lab_bacc": 0.16666666666666666,
+   "lab_acc_insample": 0.09620353806400318,
+   "lab_bacc_insample": 0.05857238760013347,
+   "secs": 0.0
+  },
+  "per-lab scale": {
+   "rank": 0,
+   "transductive": true,
+   "valence_loto": 0.6298001541364373,
+   "lab_acc": 0.9666070363744782,
+   "lab_bacc": 0.96185777527282,
+   "lab_acc_insample": 0.966209501093222,
+   "lab_bacc_insample": 0.9614979866619396,
+   "secs": 0.0
+  },
+  "per-lab z": {
+   "rank": 0,
+   "transductive": true,
+   "valence_loto": 0.5059786925568637,
+   "lab_acc": 0.291393361160803,
+   "lab_bacc": 0.16666666666666666,
+   "lab_acc_insample": 0.11051480818922679,
+   "lab_bacc_insample": 0.06845808728650792,
+   "lab_quad": 0.291393361160803,
+   "lab_quad_bacc": 0.16666666666666666,
+   "lab_mlp": 0.9697873186245279,
+   "lab_mlp_bacc": 0.9542998077135275,
+   "lab_rff": 0.7400119260584377,
+   "lab_rff_bacc": 0.6118710868615906,
+   "secs": 0.0
+  },
+  "CORAL-train": {
+   "rank": 0,
+   "transductive": false,
+   "valence_loto": 0.6505842125311152,
+   "lab_acc": 0.291393361160803,
+   "lab_bacc": 0.16666666666666666,
+   "lab_acc_insample": 0.07056251242297754,
+   "lab_bacc_insample": 0.04158231373263926,
+   "secs": 46.8,
+   "lab_quad": 0.33432717153647384,
+   "lab_quad_bacc": 0.3053912150078259,
+   "lab_mlp": 0.6936990657920891,
+   "lab_mlp_bacc": 0.622138091159771,
+   "lab_rff": 0.39594514013118665,
+   "lab_rff_bacc": 0.2613657819278003
+  },
+  "CORAL-all": {
+   "rank": 0,
+   "transductive": true,
+   "valence_loto": 0.5156004086682553,
+   "lab_acc": 0.291393361160803,
+   "lab_bacc": 0.16666666666666666,
+   "lab_acc_insample": 0.07056251242297754,
+   "lab_bacc_insample": 0.04158231373263926,
+   "lab_quad": 0.33432717153647384,
+   "lab_quad_bacc": 0.3053912150078259,
+   "lab_mlp": 0.6936990657920891,
+   "lab_mlp_bacc": 0.622138091159771,
+   "lab_rff": 0.39594514013118665,
+   "lab_rff_bacc": 0.2613657819278003,
+   "secs": 0.0
+  },
+  "INLP-fix-5": {
+   "rank": 5,
+   "transductive": false,
+   "valence_loto": 0.6598774290514704,
+   "lab_acc": 0.9338103756708408,
+   "lab_bacc": 0.9248137083059021,
+   "lab_acc_insample": 0.9103557940767243,
+   "lab_bacc_insample": 0.8982510198788175,
+   "secs": 0.0
+  },
+  "INLP-fix-32": {
+   "rank": 32,
+   "transductive": false,
+   "valence_loto": 0.6649953788596856,
+   "lab_acc": 0.9113496322798649,
+   "lab_bacc": 0.9005713816766155,
+   "lab_acc_insample": 0.8431723315444246,
+   "lab_bacc_insample": 0.8230629960557164,
+   "secs": 0.0,
+   "lab_quad": 0.9348042138739813,
+   "lab_quad_bacc": 0.9243322488385758,
+   "lab_mlp": 0.9471278075929239,
+   "lab_mlp_bacc": 0.9411109502003147,
+   "lab_rff": 0.9014112502484596,
+   "lab_rff_bacc": 0.8730889309184313
+  },
+  "NAP-1": {
+   "rank": 1,
+   "transductive": false,
+   "valence_loto": 0.6556283422065132,
+   "lab_acc": 0.9093619558735838,
+   "lab_bacc": 0.9039694483454787,
+   "lab_acc_insample": 0.905982905982906,
+   "lab_bacc_insample": 0.9004458005526784,
+   "secs": 0.0
+  },
+  "NAP-3": {
+   "rank": 3,
+   "transductive": false,
+   "valence_loto": 0.6344434404906382,
+   "lab_acc": 0.6398330351818724,
+   "lab_bacc": 0.6548661930209786,
+   "lab_acc_insample": 0.5106340687736036,
+   "lab_bacc_insample": 0.5284276428293521,
+   "secs": 0.0
+  },
+  "NAP-4": {
+   "rank": 4,
+   "transductive": false,
+   "valence_loto": 0.656929052946752,
+   "lab_acc": 0.4021069369906579,
+   "lab_bacc": 0.40526235592287385,
+   "lab_acc_insample": 0.1488769628304512,
+   "lab_bacc_insample": 0.14989942625580024,
+   "secs": 0.0
+  },
+  "rand-2": {
+   "rank": 2,
+   "transductive": false,
+   "valence_loto": 0.6526164807875723,
+   "lab_acc": 0.9399721725303121,
+   "lab_bacc": 0.9313282396455526,
+   "lab_acc_insample": 0.9399721725303121,
+   "lab_bacc_insample": 0.9313282396455526,
+   "secs": 0.0
+  }
+ }
+}
