@@ -848,3 +848,70 @@ nonlinear or adversarial method, which needs training and therefore a GPU.
 
 Figure `figures/invariance.png`; data `results/out_invariance/results.json`; code
 `experiments/encoder/phase1_invariance.py`.
+
+---
+
+# ITERATION 13 — site invariance: two methods fail, and the failure is well characterised
+
+Following iteration 12 (individual identity is a removable low-rank subspace; pig LAB identity is not),
+two follow-ups asked whether we simply stopped too early or used too weak a method.
+
+## Deeper linear projection — it plateaus, definitively
+
+INLP on pig lab identity, all the way to rank 384 of 768 dimensions:
+
+| rank | valence (held-out lab) | lab identity | lab identity, random dirs |
+|---|---|---|---|
+| 0 | 0.654 | 0.941 | 0.941 |
+| 32 | 0.662 | 0.828 | 0.940 |
+| 64 | 0.665 | **0.819** | 0.941 |
+| 128 | 0.665 | 0.820 | 0.940 |
+| 256 | 0.665 | 0.820 | 0.935 |
+| 384 | 0.665 | 0.819 | 0.937 |
+
+**Flat from rank 64 onward.** Deleting half the dimensions removes nothing further. This is not
+"we didn't look hard enough" — linear projection provably saturates at 0.82, still far above the
+0.167 chance level. Valence is untouched throughout (+0.011), so nothing is being destroyed either.
+
+## Domain-adversarial training — actively counterproductive
+
+A gradient-reversal MLP (768→256→128, context head + lab head behind a GRL), λ swept 0→3:
+
+| λ | pigs ctx / lab | cats ctx / id | dogs ctx / id |
+|---|---|---|---|
+| 0 (plain MLP, no adversary) | 0.617 / 0.878 | 0.740 / 0.581 | 0.834 / 0.562 |
+| 0.3 | 0.655 / 0.904 | 0.766 / **0.680** | 0.827 / 0.620 |
+| 1.0 | 0.648 / 0.905 | 0.737 / 0.648 | 0.856 / **0.662** |
+| 3.0 | 0.662 / 0.894 | 0.742 / 0.608 | 0.840 / 0.630 |
+
+**Turning the adversary up made group identity MORE decodable, not less.** Whatever removal the MLP
+achieves comes from its 768→128 bottleneck, not from the adversarial objective.
+
+This is the textbook DANN failure mode and worth stating precisely: the adversary only defeats *its
+own* discriminator head. We measure afterwards with a **fresh** logistic probe, which finds the
+information sitting where it always was. Beating the adversary during training is not evidence of
+invariance — a point the invariance literature makes and that this reproduces cleanly.
+
+## Head-to-head
+
+| | raw ctx / id | linear INLP | adversarial DANN |
+|---|---|---|---|
+| cats | 0.782 / 0.721 | **0.780 / 0.256** | 0.740 / 0.581 |
+| dogs | 0.846 / 0.753 | **0.849 / 0.208** | 0.834 / 0.562 |
+| pigs | 0.654 / 0.941 | 0.665 / **0.819** | 0.617 / 0.878 |
+
+**The 30-line linear projection beats the trained neural network on every dataset** — 2–3× more
+identity removed, and it preserves context better (the MLP also loses accuracy).
+
+That is now the fourth time on this project the simpler method wins under honest evaluation:
+eGeMAPS matched WavLM; time-expansion beat multiband fusion; hand-crafted features beat the encoder
+on pigs under held-out lab; and now linear erasure beats adversarial training.
+
+## Status of the site-invariance problem
+Individual nuisance: **solved**, free, post-hoc. Site nuisance: **open**, and now characterised —
+not low-rank, not reachable by gradient reversal. Remaining candidates (LEACE with its formal
+guarantee, WCCN from speaker verification, CORAL, nonlinear probing to test whether the information
+is even linearly held) are under test.
+
+Code `experiments/encoder/{phase1_invariance,phase1b_adversarial,deep_rank}.py`;
+data `results/out_invariance/`, `results/out_adversarial/`.
