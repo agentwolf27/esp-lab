@@ -93,7 +93,25 @@ Only a couple of systems use any of this (spatiotemporal priors for bird ID). No
 
 ---
 
-## 2. The idea I think is genuinely ours
+## 2. ~~The idea I think is genuinely ours~~ — TESTED 17 Aug, IT DOES NOT WORK
+
+> **Result:** allometric pitch normalisation gives 0.578 mean cross-species transfer against 0.572 for
+> raw pitch, 0.569 for within-species z-scoring, and **0.577 for using no pitch feature at all**
+> (+0.003, p=0.69). Dead.
+>
+> **Why, and it is a conceptual error not a data problem:** the pitch→affect weight is cat −0.20,
+> dog −1.24, **pig +0.21**. The sign flips. Allometric normalisation shifts and rescales the pitch
+> axis; it cannot reverse it. I proposed this *because* cues point in opposite directions across
+> species, then proposed a fix incapable of addressing opposite directions.
+>
+> **Salvage:** within the 10 dogs with real measured masses, log F0 scales at b=−0.334, R²=0.48,
+> p=0.026 — an independent replication of the carnivore/isometric exponent on a 2008 corpus collected
+> for another purpose. And the surviving cross-species fact is cleaner than the hypothesis was:
+> **duration is the only affect cue with a consistent sign across cats, dogs and pigs.**
+>
+> Full detail in FINDINGS.md iteration 14. Original text below, kept for the record.
+
+## 2. (original) The idea I think is genuinely ours
 
 **Allometric normalisation of pitch.**
 
@@ -164,7 +182,7 @@ same rank of *random* directions removes nothing, so this is invariance and not 
 - **2c. Nonlinear-phenomena features** — implement chaos/subharmonic detection, add to eGeMAPS,
   test on the affect tasks.
 
-### Phase 3 — the allometry idea (~week)
+### Phase 3 — the allometry idea ❌ **RUN AND REJECTED 17 Aug — see above**
 - **3a.** Get body masses per species (and per individual where available — the dog corpus has weights).
 - **3b.** Fit the F0–mass scaling law on our data; compute normalised pitch.
 - **3c.** Re-run cross-species transfer with allometric features. **Prediction: it improves

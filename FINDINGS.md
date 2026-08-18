@@ -915,3 +915,78 @@ is even linearly held) are under test.
 
 Code `experiments/encoder/{phase1_invariance,phase1b_adversarial,deep_rank}.py`;
 data `results/out_invariance/`, `results/out_adversarial/`.
+
+---
+
+# ITERATION 14 — allometric pitch normalisation: tested, and it does not work
+
+The idea in `paper/ENCODER_PLAN.md` §2, described there as "the idea I think is genuinely ours" and
+"the first thing I would test": body mass predicts fundamental frequency across mammals, so raw pitch
+is not comparable between a 3 kg cat and a 300 kg pig — but *pitch relative to what the body predicts*
+might be. An animal calling higher than its size predicts is straining, in any species.
+
+**It does not work. Not over raw pitch, not over within-species z-scoring, and not over having no
+pitch feature at all.**
+
+## The transfer test (mean balanced accuracy, 6 directed species pairs)
+
+| no pitch at all | raw F0 | allometric residual | allometric, law fitted excluding test species | within-species z-scored F0 |
+|---|---|---|---|---|
+| **0.577** | 0.572 | **0.578** | 0.580 | 0.569 |
+
+Everything sits within 0.022. Allometric beats raw by +0.009 (sign test p=0.22), beats within-species
+z by +0.011 (p=0.22), and beats **dropping pitch entirely** by +0.003 (p=0.69). Only 1 of 6 pairs
+clears its permutation null — and the no-pitch baseline clears that one too. Raw F0 clears none.
+
+## Why it fails, and why I should have seen it
+
+Probe weights on the pitch feature (positive = predicts negative affect): **cat −0.20, dog −1.24,
+pig +0.21.** The pigs flip sign.
+
+**No location or scale correction can repair a sign flip.** Allometric normalisation shifts and
+rescales the pitch axis; it cannot reverse it. I proposed this after noticing that spectral cues point
+in opposite directions across species — and then proposed a fix that is mathematically incapable of
+addressing opposite directions. That was a conceptual error, not a data problem.
+
+Only **duration** agrees across all three species (+0.27 / +1.43 / +1.25), and duration+energy alone
+*is* the 0.577 baseline that every fancier variant merely matches.
+
+## The genuine positive, orthogonal to the hypothesis
+
+Within the 10 dogs — the only animals with **real measured body masses** rather than imputed ones —
+log F0 scales with mass at **b = −0.334, R² = 0.48, p = 0.026**. That is an independent replication of
+the isometric / carnivore scaling exponent (theory −0.333; Bowling et al. carnivores −0.335) on a
+corpus collected in 2008 for an entirely different purpose. Small, but real.
+
+The cross-species fit is much weaker: b = −0.389, R² = 0.205, **p = 0.068, n.s.**, and dropping one
+species swings it from −0.089 to −0.907. Three species cannot establish an allometric law.
+
+## Methodological findings worth keeping
+
+- **For cats and pigs, "allometry" was species-mean centering in disguise** (r = 0.956 and 0.963),
+  because imputed mass takes only 4 and 3 distinct values. The feature was not doing what its name said.
+- **Permutation nulls are not at 0.5** — they run 0.46–0.67 by pair, because several cats and 2 of 6
+  pig labs are single-class. Reporting these against naive chance would have overstated everything.
+- **F0 extraction failure is not missing-at-random**: 100% success on negative cat clips vs 88% on
+  positive; 49.6% vs 40.2% in pigs. Discarded honestly rather than imputed.
+- **Our pitch tracker flattered the idea.** Validated against Soundwel's own published F0: log-log
+  r = 0.78, with 44% of clips off by more than an octave. Re-running with the corpus's expert F0
+  values puts *every* pitch variant **below** the no-pitch baseline.
+- **Formant dispersion is not measurable on this data** — LPC returns Df ≈ 4000/model-order for all
+  three species and ranks pigs backwards. Cat formant spacing (~2460 Hz) cannot be resolved from a
+  600 Hz harmonic comb inside a 4 kHz band. A physical limit, not a bug.
+- **Segmentation matters**: dog files are 12 s bouts, pig calls 0.3 s. Analysing the focal call rather
+  than the file (validated r = 0.976 against published durations) roughly doubles duration's
+  cross-species affect separation.
+
+## Where this leaves the encoder plan
+
+Layer 4 (metadata) loses its flagship idea. What survives is the finding underneath it: **the only
+cross-species affect cue we can find that has a consistent sign is call duration**, and adding pitch
+in any form adds nothing. That is a cleaner and more surprising sentence than the one I set out to
+write, and it strengthens rather than weakens the transfer chapter — it explains *why* the transfer is
+small and covariance-relative rather than a shared direction.
+
+Fifth instance of the pattern: the no-pitch baseline beats every pitch-based elaboration.
+
+Data `results/out_allometry/`; code `experiments/allometry/`.
