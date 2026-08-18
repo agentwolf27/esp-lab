@@ -1,0 +1,67 @@
+{
+  "annotations": 91080,
+  "audio_files_in_corpus": 293238,
+  "calls_with_known_emitter": 83222,
+  "emitters": 82,
+  "days": 345,
+  "date_range": [
+    "2012-06-01",
+    "2014-02-19"
+  ],
+  "treatments": 21,
+  "channels": 12,
+  "emitters_with_at_least_n_days": {
+    "2": 82,
+    "3": 81,
+    "5": 80,
+    "10": 79
+  },
+  "emitters_with_at_least_n_treatments": {
+    "2": 32,
+    "3": 29,
+    "5": 7,
+    "10": 0
+  },
+  "median_calls_per_emitter": 576.5,
+  "median_days_per_emitter": 62.0,
+  "cramers_v": {
+    "emitter_vs_channel": 0.5889169804448148,
+    "emitter_vs_treatment": 0.5940367937065705,
+    "emitter_vs_day": 0.2451538128535791
+  },
+  "subsamples": [
+    {
+      "cap_per_emitter": 100,
+      "calls": 7769,
+      "emitters": 82,
+      "distinct_files": 7712,
+      "approx_audio_gb": 2.6,
+      "median_days_per_emitter": 41.0,
+      "min_days_per_emitter": 2,
+      "every_emitter_on_2plus_days": true
+    },
+    {
+      "cap_per_emitter": 200,
+      "calls": 13811,
+      "emitters": 82,
+      "distinct_files": 13681,
+      "approx_audio_gb": 4.6,
+      "median_days_per_emitter": 51.5,
+      "min_days_per_emitter": 2,
+      "every_emitter_on_2plus_days": true
+    },
+    {
+      "cap_per_emitter": 400,
+      "calls": 23646,
+      "emitters": 82,
+      "distinct_files": 23257,
+      "approx_audio_gb": 7.8,
+      "median_days_per_emitter": 58.0,
+      "min_days_per_emitter": 2,
+      "every_emitter_on_2plus_days": true
+    }
+  ],
+  "folders_touched": 30,
+  "archives_total": 31,
+  "download_gb_to_get_any_subsample": 94.6
+}
