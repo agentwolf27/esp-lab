@@ -1,109 +1,544 @@
+% =====================================================================
+% refs.bib -- Paper A ("Who, Not Why"), ICBINB-BIO @ NeurIPS 2026
+% Every entry below was verified against a publisher record (Crossref /
+% arXiv API / ACL Anthology / Europe PMC) on 17 Aug 2026.
+% Per-entry provenance: see REFS_AUDIT.md in this directory.
+%
+% CONVENTIONS
+%  * All 22 original citation keys are preserved -- paper_a.tex compiles
+%    unchanged. No renames.
+%  * Editorial annotations live in % comments, NOT in `note` fields,
+%    because \bibliographystyle{plainnat} PRINTS note fields into the
+%    rendered bibliography. (The previous file leaked five such notes.)
+%  * Acronyms and proper nouns are brace-protected: plainnat lowercases
+%    titles.
+%  * Non-ASCII is written with LaTeX escapes for encoding safety.
+%  * `note`/`howpublished` is used only where the venue really is arXiv.
+% =====================================================================
+
+
+% ---------------------------------------------------------------------
+% Identity confounding outside bioacoustics
+% ---------------------------------------------------------------------
+
 @article{chaibubneto2019,
-  title={Detecting the impact of subject characteristics on machine learning-based diagnostic applications},
-  author={Chaibub Neto, Elias and Pratap, Abhishek and Perumal, Thanneer M and others},
-  journal={npj Digital Medicine}, volume={2}, number={1}, pages={99}, year={2019}}
+  title   = {Detecting the impact of subject characteristics on machine
+             learning-based diagnostic applications},
+  author  = {Chaibub Neto, Elias and Pratap, Abhishek and Perumal, Thanneer M.
+             and Tummalacherla, Meghasyam and Snyder, Phil and Bot, Brian M.
+             and Trister, Andrew D. and Friend, Stephen H. and Mangravite, Lara
+             and Omberg, Larsson},
+  journal = {npj Digital Medicine},
+  volume  = {2},
+  number  = {1},
+  pages   = {99},
+  year    = {2019},
+  doi     = {10.1038/s41746-019-0178-x}}
 
 @article{saeb2017,
-  title={The need to approximate the use-case in clinical machine learning},
-  author={Saeb, Sohrab and Lonini, Luca and Jayaraman, Arun and Mohr, David C and Kording, Konrad P},
-  journal={GigaScience}, volume={6}, number={5}, year={2017}}
+  title   = {The need to approximate the use-case in clinical machine learning},
+  author  = {Saeb, Sohrab and Lonini, Luca and Jayaraman, Arun and
+             Mohr, David C. and Kording, Konrad P.},
+  journal = {GigaScience},
+  volume  = {6},
+  number  = {5},
+  pages   = {gix019},
+  year    = {2017},
+  doi     = {10.1093/gigascience/gix019}}
 
-@inproceedings{han2022,
-  title={Exploring Longitudinal Cough, Breath, and Voice Data for COVID-19 Progression Prediction via Sequential Deep Learning},
-  author={Han, Jing and Xia, Tong and Spathis, Dimitris and others},
-  booktitle={Interspeech}, year={2022}, note={see also their analysis of identity-confounded splits}}
+% CORRECTED. The previous entry pointed at Han et al.'s Interspeech 2022
+% longitudinal-progression paper, which is a real paper but does NOT
+% contain the random-vs-participant split comparison the text relies on.
+% This is the paper that does: participant-independent AUC 0.71 vs a
+% random split giving sensitivity 0.84 / specificity 0.78, and verbatim
+% "random-splits yielded a higher accuracy than user-splits, with the
+% performance gains coming from the overlapping participants whose data
+% have been seen from training."
+@article{han2022,
+  title   = {Sounds of {COVID-19}: exploring realistic performance of
+             audio-based digital testing},
+  author  = {Han, Jing and Xia, Tong and Spathis, Dimitris and
+             Bondareva, Erika and Brown, Chlo{\"e} and Chauhan, Jagmohan and
+             Dang, Ting and Grammenos, Andreas and Hasthanasombat, Apinan and
+             Floto, Andres and Cicuta, Pietro and Mascolo, Cecilia},
+  journal = {npj Digital Medicine},
+  volume  = {5},
+  number  = {1},
+  pages   = {16},
+  year    = {2022},
+  doi     = {10.1038/s41746-021-00553-x}}
 
-@article{lin2026,
-  title={The Identity Trap: Subject Identity Dominates Task Decoding in EEG Foundation Models},
-  author={Lin, [FIRST] and others}, journal={[VERIFY]}, year={2026},
-  note={VERIFY full citation from paper/RELATED\_WORK.md before submission}}
+% CORRECTED TITLE (key kept). Real title is "...: A Diagnostic Audit",
+% not "...: Subject Identity Dominates Task Decoding...". Authors are
+% Jun-You Lin, Ying Choon Wu, Tzyy-Ping Jung (UC San Diego / SCCN).
+% Submitted 4 Jun 2026; arXiv-only, unrefereed.
+@misc{lin2026,
+  title        = {The Identity Trap in {EEG} Foundation Models:
+                  A Diagnostic Audit},
+  author       = {Lin, Jun-You and Wu, Ying Choon and Jung, Tzyy-Ping},
+  year         = {2026},
+  howpublished = {arXiv:2606.06647},
+  eprint       = {2606.06647},
+  archivePrefix= {arXiv}}
+
+
+% ---------------------------------------------------------------------
+% Shortcut learning and leakage
+% ---------------------------------------------------------------------
 
 @article{degrave2021,
-  title={AI for radiographic COVID-19 detection selects shortcuts over signal},
-  author={DeGrave, Alex J and Janizek, Joseph D and Lee, Su-In},
-  journal={Nature Machine Intelligence}, volume={3}, number={7}, pages={610--619}, year={2021}}
+  title   = {{AI} for radiographic {COVID-19} detection selects shortcuts
+             over signal},
+  author  = {DeGrave, Alex J. and Janizek, Joseph D. and Lee, Su-In},
+  journal = {Nature Machine Intelligence},
+  volume  = {3},
+  number  = {7},
+  pages   = {610--619},
+  year    = {2021},
+  doi     = {10.1038/s42256-021-00338-7}}
 
 @article{geirhos2020,
-  title={Shortcut learning in deep neural networks},
-  author={Geirhos, Robert and Jacobsen, J{\"o}rn-Henrik and Michaelis, Claudio and others},
-  journal={Nature Machine Intelligence}, volume={2}, number={11}, pages={665--673}, year={2020}}
+  title   = {Shortcut learning in deep neural networks},
+  author  = {Geirhos, Robert and Jacobsen, J{\"o}rn-Henrik and
+             Michaelis, Claudio and Zemel, Richard and Brendel, Wieland and
+             Bethge, Matthias and Wichmann, Felix A.},
+  journal = {Nature Machine Intelligence},
+  volume  = {2},
+  number  = {11},
+  pages   = {665--673},
+  year    = {2020},
+  doi     = {10.1038/s42256-020-00257-z}}
 
 @article{kapoor2023,
-  title={Leakage and the reproducibility crisis in machine-learning-based science},
-  author={Kapoor, Sayash and Narayanan, Arvind},
-  journal={Patterns}, volume={4}, number={9}, year={2023}}
+  title   = {Leakage and the reproducibility crisis in machine-learning-based
+             science},
+  author  = {Kapoor, Sayash and Narayanan, Arvind},
+  journal = {Patterns},
+  volume  = {4},
+  number  = {9},
+  pages   = {100804},
+  year    = {2023},
+  doi     = {10.1016/j.patter.2023.100804}}
 
-@article{colonna2016,
-  title={How to correctly evaluate an automatic bioacoustics classification method},
-  author={Colonna, Juan G and Nakamura, Eduardo F and others},
-  journal={Conference of the Spanish Association for Artificial Intelligence}, year={2016}}
 
+% ---------------------------------------------------------------------
+% Bioacoustic evaluation practice
+% ---------------------------------------------------------------------
+
+% CORRECTED. Jo\~ao Gama was missing from the author list (was hidden
+% behind "and others"), and the venue was recorded as a journal. It is a
+% Springer LNCS conference chapter: CAEPIA 2016, LNCS vol. 9868, pp. 37-47.
+@inproceedings{colonna2016,
+  title     = {How to Correctly Evaluate an Automatic Bioacoustics
+               Classification Method},
+  author    = {Colonna, Juan Gabriel and Gama, Jo{\~a}o and
+               Nakamura, Eduardo Freire},
+  booktitle = {Advances in Artificial Intelligence (CAEPIA 2016)},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {9868},
+  pages     = {37--47},
+  publisher = {Springer},
+  year      = {2016},
+  doi       = {10.1007/978-3-319-44636-3_4}}
+
+% VERIFIED. Author order and initials confirmed: Ghani, Baier, Kalkman,
+% Stowell. Published 12 Aug 2026 -- five days before this audit.
 @article{ghani2026,
-  title={Twelve quick tips for applying deep learning to animal sounds},
-  author={Ghani, Burooj and Baier, [FIRST] and Kalkman, [FIRST] and Stowell, Dan},
-  journal={PLOS Computational Biology}, year={2026}}
+  title   = {Twelve quick tips for applying deep learning to animal sounds},
+  author  = {Ghani, Burooj and Baier, Anne Leonie and Kalkman, Vincent J.
+             and Stowell, Dan},
+  journal = {PLOS Computational Biology},
+  volume  = {22},
+  number  = {8},
+  pages   = {e1014604},
+  year    = {2026},
+  doi     = {10.1371/journal.pcbi.1014604}}
 
 @article{stowell2019,
-  title={Automatic acoustic identification of individuals in multiple species: improving identification across recording conditions},
-  author={Stowell, Dan and Petrusková, Tereza and Šálek, Martin and Linhart, Pavel},
-  journal={Journal of the Royal Society Interface}, volume={16}, number={153}, year={2019}}
+  title   = {Automatic acoustic identification of individuals in multiple
+             species: improving identification across recording conditions},
+  author  = {Stowell, Dan and Petruskov{\'a}, Tereza and {\v S}{\'a}lek, Martin
+             and Linhart, Pavel},
+  journal = {Journal of the Royal Society Interface},
+  volume  = {16},
+  number  = {153},
+  pages   = {20180940},
+  year    = {2019},
+  doi     = {10.1098/rsif.2018.0940}}
+
+
+% ---------------------------------------------------------------------
+% Benchmarks and encoders under audit
+% ---------------------------------------------------------------------
 
 @inproceedings{hagiwara2023beans,
-  title={{BEANS}: The Benchmark of Animal Sounds},
-  author={Hagiwara, Masato and Hoffman, Benjamin and Liu, Jen-Yu and others},
-  booktitle={ICASSP}, year={2023}}
+  title     = {{BEANS}: The Benchmark of Animal Sounds},
+  author    = {Hagiwara, Masato and Hoffman, Benjamin and Liu, Jen-Yu and
+               Cusimano, Maddie and Effenberger, Felix and Zacarian, Katie},
+  booktitle = {ICASSP 2023 -- IEEE International Conference on Acoustics,
+               Speech and Signal Processing},
+  pages     = {1--5},
+  year      = {2023},
+  doi       = {10.1109/ICASSP49357.2023.10096686}}
 
 @inproceedings{hagiwara2023aves,
-  title={{AVES}: Animal Vocalization Encoder based on Self-Supervision},
-  author={Hagiwara, Masato}, booktitle={ICASSP}, year={2023}}
+  title     = {{AVES}: Animal Vocalization Encoder based on Self-Supervision},
+  author    = {Hagiwara, Masato},
+  booktitle = {ICASSP 2023 -- IEEE International Conference on Acoustics,
+               Speech and Signal Processing},
+  pages     = {1--5},
+  year      = {2023},
+  doi       = {10.1109/ICASSP49357.2023.10095642}}
 
+% ICLR 2026 acceptance confirmed from the arXiv comment field
+% ("In The Fourteenth International Conference on Learning Representations
+% 2026"). Seventeen authors; the previous "and others" hid fourteen of them.
 @inproceedings{miron2026avex,
-  title={{AVEX}: What Matters for Animal Vocalization Encoding},
-  author={Miron, Marius and Robinson, David and Alizadeh, Milad and others},
-  booktitle={ICLR}, year={2026}}
+  title     = {{AVEX}: What Matters for Animal Vocalization Encoding},
+  author    = {Miron, Marius and Robinson, David and Alizadeh, Milad and
+               Gilsenan-McMahon, Ellen and Narula, Gagan and Chemla, Emmanuel
+               and Cusimano, Maddie and Effenberger, Felix and
+               Hagiwara, Masato and Hoffman, Benjamin and Keen, Sara and
+               Kim, Diane and Lawton, Jane and Liu, Jen-Yu and Raskin, Aza
+               and Pietquin, Olivier and Geist, Matthieu},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2026},
+  note      = {arXiv:2508.11845},
+  eprint    = {2508.11845},
+  archivePrefix = {arXiv}}
 
-@article{schwinger2026,
-  title={Uncertainty Calibration of Multi-Label Bird Sound Classifiers},
-  author={Schwinger, [FIRST] and others}, journal={arXiv:2511.08261}, year={2026}}
+% Accepted at ICAART 2026 (confirmed from the arXiv comment field).
+% Full author list recovered; the paper reports that "model calibration
+% varies significantly across datasets and classes", which is what the
+% text cites it for.
+@inproceedings{schwinger2026,
+  title     = {Uncertainty Calibration of Multi-Label Bird Sound Classifiers},
+  author    = {Schwinger, Raphael and McEwen, Ben and Kather, Vincent S. and
+               Heinrich, Ren{\'e} and Rauch, Lukas and Tomforde, Sven},
+  booktitle = {International Conference on Agents and Artificial Intelligence
+               (ICAART)},
+  year      = {2026},
+  note      = {arXiv:2511.08261},
+  eprint    = {2511.08261},
+  archivePrefix = {arXiv}}
 
-@article{abzaliev2024,
-  title={Towards Dog Bark Decoding: Leveraging Human Speech Processing for Automated Bark Classification},
-  author={Abzaliev, Artem and Espinosa-Anke, Luis and Mihalcea, Rada},
-  journal={LREC-COLING}, year={2024},
-  note={reports dog identity 0.50 vs 0.05 chance beside context 0.62 vs 0.56 baseline}}
 
+% ---------------------------------------------------------------------
+% Closest bioacoustic prior
+% ---------------------------------------------------------------------
+
+% CORRECTED AUTHOR. The second author is Humberto P\'erez Espinosa
+% (INAOE, Mexico) -- NOT Luis Espinosa-Anke (Cardiff), who is a different
+% researcher entirely. Numbers verified from the ACL Anthology full text:
+% dog recognition 49.95% vs 5.03% majority baseline (Table 2); context
+% grounding 62.18% vs 56.37% majority baseline (Table 4); 74 dogs.
+@inproceedings{abzaliev2024,
+  title     = {Towards Dog Bark Decoding: Leveraging Human Speech Processing
+               for Automated Bark Classification},
+  author    = {Abzaliev, Artem and P{\'e}rez Espinosa, Humberto and
+               Mihalcea, Rada},
+  booktitle = {Proceedings of the 2024 Joint International Conference on
+               Computational Linguistics, Language Resources and Evaluation
+               (LREC-COLING 2024)},
+  pages     = {16480--16486},
+  address   = {Torino, Italia},
+  publisher = {ELRA and ICCL},
+  month     = may,
+  year      = {2024},
+  eprint    = {2404.18739},
+  archivePrefix = {arXiv}}
+
+
+% ---------------------------------------------------------------------
+% Conformal prediction
+% ---------------------------------------------------------------------
+
+% Journal issue is 10(2), June 2021 (online-first Aug 2020). Cite 2021.
 @article{barber2021,
-  title={The limits of distribution-free conditional predictive inference},
-  author={Barber, Rina Foygel and Cand{\`e}s, Emmanuel J and Ramdas, Aaditya and Tibshirani, Ryan J},
-  journal={Information and Inference}, volume={10}, number={2}, pages={455--482}, year={2021}}
+  title   = {The limits of distribution-free conditional predictive inference},
+  author  = {Foygel Barber, Rina and Cand{\`e}s, Emmanuel J. and
+             Ramdas, Aaditya and Tibshirani, Ryan J.},
+  journal = {Information and Inference: A Journal of the IMA},
+  volume  = {10},
+  number  = {2},
+  pages   = {455--482},
+  year    = {2021},
+  doi     = {10.1093/imaiai/iaaa017}}
 
+% VERIFIED VERBATIM, Section 1.2 "Preliminaries":
+%   "Importantly, for any class y for which |I^y| < (1/alpha) - 1, we will
+%    have qhat^y = infinity, hence any prediction set generated by
+%    classwise will include y, no matter the values of the conformal
+%    scores."
+% At alpha = 0.10, (1/alpha) - 1 = 9, so >= 9 calibration points are
+% required for a finite class-conditional quantile. The paper's reading
+% is exact. Same paper defines CovGap (Sec. 3.2) and a fraction-
+% undercovered metric (Appendix C.2).
 @inproceedings{ding2023,
-  title={Class-Conditional Conformal Prediction with Many Classes},
-  author={Ding, Tiffany and Angelopoulos, Anastasios N and Bates, Stephen and Jordan, Michael I and Tibshirani, Ryan J},
-  booktitle={NeurIPS}, year={2023},
-  note={gives the $(1/\alpha)-1$ class-conditional sample-size bound}}
+  title     = {Class-Conditional Conformal Prediction with Many Classes},
+  author    = {Ding, Tiffany and Angelopoulos, Anastasios N. and
+               Bates, Stephen and Jordan, Michael I. and
+               Tibshirani, Ryan J.},
+  booktitle = {Advances in Neural Information Processing Systems 36
+               (NeurIPS 2023)},
+  year      = {2023},
+  eprint    = {2306.09335},
+  archivePrefix = {arXiv}}
 
-@article{tang2023,
-  title={Cross-lingual speech emotion recognition with self-supervised representations},
-  author={Tang, [FIRST] and others}, journal={[VERIFY]}, year={2023},
-  note={VERIFY; reports SSL ahead of eGeMAPS -- cited as the counter-direction}}
+
+% ---------------------------------------------------------------------
+% Speech emotion recognition counter-evidence
+% ---------------------------------------------------------------------
+
+% IDENTIFIED. Verified verbatim from the arXiv full text: "the wav2vec 2.0
+% improves UA with about 20.9% to 66.4% compared to the eGeMAPS method",
+% and under cross-language shift "wav2vec 2.0-CL shows a very subtle
+% degradation ... whereas the eGeMAPS-CL shows a 17.8% and 18.5% decrease
+% in UA and WA, respectively." This is the most canonical fit because it
+% is the only paper that runs SSL against eGeMAPS head-to-head under a
+% speaker-independent CROSS-LANGUAGE protocol with both numbers printed --
+% i.e. exactly the comparison the text claims runs the other way.
+% CAVEAT: arXiv-only (v3, Dec 2025); no peer-reviewed version exists.
+% Consider pairing with wagner2023 (IEEE TPAMI) for a refereed anchor.
+@misc{tang2023,
+  title        = {End-to-end transfer learning for speaker-independent
+                  cross-language and cross-corpus speech emotion recognition},
+  author       = {Tang, Duowei and Kuppens, Peter and Geurts, Lucca and
+                  van Waterschoot, Toon},
+  year         = {2023},
+  howpublished = {arXiv:2311.13678},
+  eprint       = {2311.13678},
+  archivePrefix= {arXiv}}
+
+
+% ---------------------------------------------------------------------
+% Corpora
+% ---------------------------------------------------------------------
 
 @article{molnar2008,
-  title={Classification of dog barks: a machine learning approach},
-  author={Moln{\'a}r, Csaba and Kaplan, Frederic and Roy, Pierre and others},
-  journal={Animal Cognition}, volume={11}, number={3}, pages={389--400}, year={2008}}
+  title   = {Classification of dog barks: a machine learning approach},
+  author  = {Moln{\'a}r, Csaba and Kaplan, Fr{\'e}d{\'e}ric and Roy, Pierre
+             and Pachet, Fran{\c c}ois and Pongr{\'a}cz, P{\'e}ter and
+             D{\'o}ka, Antal and Mikl{\'o}si, {\'A}d{\'a}m},
+  journal = {Animal Cognition},
+  volume  = {11},
+  number  = {3},
+  pages   = {389--400},
+  year    = {2008},
+  doi     = {10.1007/s10071-007-0129-9}}
 
 @article{prat2017,
-  title={An annotated dataset of Egyptian fruit bat vocalizations across varying contexts and during vocal ontogeny},
-  author={Prat, Yosef and Taub, Mor and Pratt, Ester and Yovel, Yossi},
-  journal={Scientific Data}, volume={4}, pages={170143}, year={2017}}
+  title   = {An annotated dataset of {Egyptian} fruit bat vocalizations across
+             varying contexts and during vocal ontogeny},
+  author  = {Prat, Yosef and Taub, Mor and Pratt, Ester and Yovel, Yossi},
+  journal = {Scientific Data},
+  volume  = {4},
+  pages   = {170143},
+  year    = {2017},
+  doi     = {10.1038/sdata.2017.143}}
 
-@article{ludovico2021,
-  title={{CatMeows}: A Publicly-Available Dataset of Cat Vocalizations},
-  author={Ludovico, Luca Andrea and Ntalampiras, Stavros and Presti, Giorgio and others},
-  journal={MultiMedia Modeling}, year={2021}}
+% Springer LNCS chapter, MMM 2021, vol. 12573, pp. 230-243. Note the
+% author order Cannas before Battini, per the publisher record.
+% NOTE: this is the DATASET paper. The two passages quoted in Section 4.3
+% of paper_a.tex are in ntalampiras2019, not here -- see that entry.
+@inproceedings{ludovico2021,
+  title     = {{CatMeows}: A Publicly-Available Dataset of Cat Vocalizations},
+  author    = {Ludovico, Luca A. and Ntalampiras, Stavros and Presti, Giorgio
+               and Cannas, Simona and Battini, Monica and Mattiello, Silvana},
+  booktitle = {MultiMedia Modeling (MMM 2021)},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {12573},
+  pages     = {230--243},
+  publisher = {Springer},
+  year      = {2021},
+  doi       = {10.1007/978-3-030-67835-7_20}}
+
+% ADDED (new key). Required: this is where BOTH quoted phrases actually
+% appear, verified verbatim against the open-access full text.
+%   Sec. 2.1 "Treatments": "Cats were transported by their owner, adopting
+%     the normal routine used to transport them for any other reason, to an
+%     unfamiliar environment (e.g., a room in a different apartment or an
+%     office, not far from their home environment)."
+%   Sec. 2.2 "Data Acquisition": "Moreover, the characteristics of the room
+%     (e.g., topological properties, reverberations, presence of furniture,
+%     etc.) should not affect the captured audio signals."
+% The Zenodo record 4008297 names this paper as the reference publication.
+@article{ntalampiras2019,
+  title   = {Automatic Classification of Cat Vocalizations Emitted in
+             Different Contexts},
+  author  = {Ntalampiras, Stavros and Ludovico, Luca Andrea and
+             Presti, Giorgio and Prato Previde, Emanuela and
+             Battini, Monica and Cannas, Simona and Palestrini, Clara and
+             Mattiello, Silvana},
+  journal = {Animals},
+  volume  = {9},
+  number  = {8},
+  pages   = {543},
+  year    = {2019},
+  doi     = {10.3390/ani9080543}}
 
 @article{briefer2022,
-  title={Classification of pig calls produced from birth to slaughter according to their emotional valence and context of production},
-  author={Briefer, Elodie F and Sypherd, Ciara C-R and Linhart, Pavel and others},
-  journal={Scientific Reports}, volume={12}, pages={3409}, year={2022}}
+  title   = {Classification of pig calls produced from birth to slaughter
+             according to their emotional valence and context of production},
+  author  = {Briefer, Elodie F. and Sypherd, Ciara C.-R. and Linhart, Pavel
+             and Leliveld, Lisette M. C. and Padilla de la Torre, Monica and
+             Read, Eva R. and Gu{\'e}rin, Carole and Deiss, V{\'e}ronique and
+             Monestier, Chlo{\'e} and Rasmussen, Jeppe H. and
+             {\v S}pinka, Marek and D{\"u}pjan, Sandra and Boissy, Alain and
+             Janczak, Andrew M. and Hillmann, Edna and Tallet, C{\'e}line},
+  journal = {Scientific Reports},
+  volume  = {12},
+  number  = {1},
+  pages   = {3409},
+  year    = {2022},
+  doi     = {10.1038/s41598-022-07174-8}}
+
+
+% =====================================================================
+% RECOMMENDED ADDITIONS -- verified, currently UNCITED in paper_a.tex.
+% BibTeX ignores uncited entries, so these are inert until \cite'd.
+% Rationale for each is in REFS_AUDIT.md, Section 6.
+% =====================================================================
+
+% -- Conformal prediction foundations (currently absent entirely) -------
+
+% The origin of class/label-conditional ("Mondrian") conformal validity.
+% Ding et al. cite exactly this for the classwise guarantee, so citing
+% ding2023 for the bound without citing Vovk skips a link in the chain.
+% Journal version of the ACML 2012 paper (PMLR 25:475-490).
+@article{vovk2013,
+  title   = {Conditional validity of inductive conformal predictors},
+  author  = {Vovk, Vladimir},
+  journal = {Machine Learning},
+  volume  = {92},
+  number  = {2--3},
+  pages   = {349--376},
+  year    = {2013},
+  doi     = {10.1007/s10994-013-5355-6}}
+
+@book{vovk2022book,
+  title     = {Algorithmic Learning in a Random World},
+  author    = {Vovk, Vladimir and Gammerman, Alexander and Shafer, Glenn},
+  edition   = {2nd},
+  publisher = {Springer},
+  year      = {2022},
+  doi       = {10.1007/978-3-031-06649-8}}
+
+% Cite for split-conformal machinery only. Do NOT cite it for the >=9
+% bound: it treats calibration size as a variance question and states the
+% guarantee holds for any n, which is the opposite of this paper's point.
+@article{angelopoulos2023,
+  title   = {Conformal Prediction: A Gentle Introduction},
+  author  = {Angelopoulos, Anastasios N. and Bates, Stephen},
+  journal = {Foundations and Trends in Machine Learning},
+  volume  = {16},
+  number  = {4},
+  pages   = {494--591},
+  year    = {2023},
+  doi     = {10.1561/2200000101}}
+
+% -- Speaker-independent SER canon (currently absent entirely) ----------
+
+% The moment SER standardised on speaker-independent partitioning.
+@inproceedings{schuller2009,
+  title     = {The {INTERSPEECH} 2009 Emotion Challenge},
+  author    = {Schuller, Bj{\"o}rn and Steidl, Stefan and Batliner, Anton},
+  booktitle = {Interspeech 2009},
+  pages     = {312--315},
+  year      = {2009},
+  doi       = {10.21437/Interspeech.2009-103}}
+
+% States that the field overestimates results by using pre-selected
+% prototypical data with "less common true speaker disjunctive
+% partitioning" -- i.e. this paper's thesis, for speech, in 2010.
+@article{schuller2010,
+  title   = {Cross-Corpus Acoustic Emotion Recognition: Variances and
+             Strategies},
+  author  = {Schuller, Bj{\"o}rn and Vlasenko, Bogdan and Eyben, Florian and
+             W{\"o}llmer, Martin and Stuhlsatz, Andre and Wendemuth, Andreas
+             and Rigoll, Gerhard},
+  journal = {IEEE Transactions on Affective Computing},
+  volume  = {1},
+  number  = {2},
+  pages   = {119--131},
+  year    = {2010},
+  doi     = {10.1109/T-AFFC.2010.8}}
+
+% Refereed anchor for the tang2023 counter-direction, and the closest
+% existing statement of Claim 1 in speech: transformer SER models are
+% fair w.r.t. gender groups but not w.r.t. individual speakers.
+@article{wagner2023,
+  title   = {Dawn of the Transformer Era in Speech Emotion Recognition:
+             Closing the Valence Gap},
+  author  = {Wagner, Johannes and Triantafyllopoulos, Andreas and
+             Wierstorf, Hagen and Schmitt, Maximilian and Burkhardt, Felix
+             and Eyben, Florian and Schuller, Bj{\"o}rn W.},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume  = {45},
+  number  = {9},
+  pages   = {10745--10759},
+  year    = {2023},
+  doi     = {10.1109/TPAMI.2023.3263585}}
+
+% -- Device / recorder / site shift in bioacoustics (currently absent) --
+
+% The hardware axis, measured: microphone sensitivity varies between
+% nominally identical ARUs and degrades with field exposure. This is the
+% physical mechanism behind a "site" or "lab" confound.
+@article{turgeon2017,
+  title   = {Microphone variability and degradation: implications for
+             monitoring programs employing autonomous recording units},
+  author  = {Turgeon, Patrick J. and Van Wilgenburg, Steven L. and
+             Drake, Kiel L.},
+  journal = {Avian Conservation and Ecology},
+  volume  = {12},
+  number  = {1},
+  pages   = {9},
+  year    = {2017},
+  doi     = {10.5751/ACE-00958-120109}}
+
+% Sensor/site generalisation in passive acoustic monitoring: detectors
+% trained on a limited number of sensors fail to generalise to new ones.
+@article{lostanlen2019,
+  title   = {Robust sound event detection in bioacoustic sensor networks},
+  author  = {Lostanlen, Vincent and Salamon, Justin and Farnsworth, Andrew
+             and Kelling, Steve and Bello, Juan Pablo},
+  journal = {PLOS ONE},
+  volume  = {14},
+  number  = {10},
+  pages   = {e0214168},
+  year    = {2019},
+  doi     = {10.1371/journal.pone.0214168}}
+
+% Scopes the site claim honestly: the focal-to-soundscape covariate shift
+% for birds is ALREADY benchmarked, with geographically distinct test
+% soundscapes. Cite so the site contribution is framed as the non-avian /
+% behavioural-context analogue rather than as new territory.
+@inproceedings{rauch2025birdset,
+  title     = {{BirdSet}: A Large-Scale Dataset for Audio Classification in
+               Avian Bioacoustics},
+  author    = {Rauch, Lukas and Schwinger, Raphael and Wirth, Moritz and
+               Heinrich, Ren{\'e} and Huseljic, Denis and Herde, Marek and
+               Lange, Jonas and Kahl, Stefan and Sick, Bernhard and
+               Tomforde, Sven and Scholz, Christoph},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2025},
+  note      = {arXiv:2403.10380},
+  eprint    = {2403.10380},
+  archivePrefix = {arXiv}}
+
+% -- Cross-domain convergent evidence (optional but recommended) --------
+
+% The "dataset identity" half of the argument in another modality:
+% classical features beat EEG foundation models, and all five encoders
+% decode dataset identity at 1.000. Single-author, arXiv-only, unrefereed
+% -- cite as convergent evidence, never as authority.
+@misc{zare2026,
+  title        = {A Negative-Control Protocol for Clinical {EEG}
+                  Foundation-Model Benchmarks: Dataset Identity and
+                  External-Cohort Stress Testing},
+  author       = {Zare, Marzieh},
+  year         = {2026},
+  howpublished = {arXiv:2607.24519},
+  eprint       = {2607.24519},
+  archivePrefix= {arXiv}}

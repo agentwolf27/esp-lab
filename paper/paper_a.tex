@@ -62,7 +62,7 @@ rewards recognising the animal and reports the result as understanding of its be
 
 Readers from clinical and genomic ML will recognise the shape of this problem: a model that reads the
 acquisition site rather than the biology, scored by a metric that cannot tell the difference
-\citep{degrave2021,lin2026}.
+\citep{degrave2021,zare2026}.
 
 That identity confounding inflates evaluation is not a new warning. It was named for biomedical data
 by \citet{chaibubneto2019}, measured for audio by \citet{han2022}, and recommended against in
@@ -85,9 +85,14 @@ site shift.
 
 \paragraph{Identity confounding outside bioacoustics.}
 \citet{saeb2017} and \citet{chaibubneto2019} formalised record-wise versus subject-wise
-cross-validation for digital health. \citet{han2022} measure it for audio health screening;
-\citet{lin2026} document an ``identity trap'' in EEG where subject identity is decodable far above the
-task label.
+cross-validation for digital health. \citet{han2022} measure it for audio health screening:
+participant-independent AUC 0.71 against a random-split sensitivity/specificity of 0.84/0.78, with the
+gain traced to overlapping participants. Speaker-independent evaluation has been standard in speech
+paralinguistics since the INTERSPEECH challenge series \citep{schuller2009,schuller2010}, and
+\citet{wagner2023} show the gap persists for modern self-supervised models. \citet{lin2026} report an
+``identity trap'' in EEG foundation models, where variance attributable to subject identity dominates
+task-related variance by one to two orders of magnitude; \citet{zare2026} document the analogous
+dataset/site effect.
 
 \paragraph{Shortcut learning.}
 The general framing is \citet{geirhos2020}; the canonical scientific demonstration is
@@ -106,10 +111,11 @@ individual-ID at 0.50 against 0.05 chance alongside context classification at 0.
 baseline, without commenting on the disparity.
 
 \paragraph{Conformal prediction.}
-\citet{barber2021} prove exact conditional coverage is unattainable in general; \citet{ding2023} give
+Split conformal prediction is due to \citet{vovk2013}; see \citet{angelopoulos2023} for a modern
+treatment. \citet{barber2021} prove exact conditional coverage is unattainable in general; \citet{ding2023} give
 the class-conditional sample-size bound $(1/\alpha)-1$ that we instantiate empirically in
-\S\ref{sec:conformal}. We found no prior application of conformal prediction to bioacoustics or
-passive acoustic monitoring.
+\S\ref{sec:conformal}. To our knowledge there is no prior application of conformal prediction to bioacoustics or passive
+acoustic monitoring.
 
 \section{Protocol}
 
@@ -118,7 +124,10 @@ with an entire group held out; \textbf{leaky}---balanced accuracy under a random
 split; and \textbf{identity}---accuracy of predicting the group label from the same features. The
 third is the diagnostic that explains the gap between the first two.
 
-Groups are the individual animal (cats, dogs, bats) or the recording lab (pigs). Probes are
+Groups are the individual animal (cats, dogs, bats) or the recording lab (pigs). Site effects have a
+concrete physical basis: \citet{turgeon2017} measured substantial microphone-to-microphone variation
+between nominally identical autonomous recording units, and \citet{lostanlen2019} document the
+resulting channel mismatch in deployed monitoring. Probes are
 $\ell_2$-regularised logistic regression on standardised, mean-pooled embeddings, one layer at a
 time; a linear probe measures what is linearly available, which is the setting practitioners use.
 Feature sets: WavLM-base-plus, HuBERT-base, wav2vec2-base, AVES-bio, eGeMAPSv02 (88 openSMILE
@@ -192,7 +201,7 @@ apply it differently: probing behavioural context directly from background frame
 vocalisation and keeping only the quietest 30\% of frames still yields 0.725 on the binary cat task.
 The corpus documentation contains both halves of the problem: the protocol transfers cats to ``a room
 in a different apartment or an office'' for the isolation condition, while the methods section states
-room characteristics ``should not affect the captured audio signals.''
+room characteristics ``should not affect the captured audio signals'' \citep{ntalampiras2019}.
 
 \section{Channel robustness}\label{sec:stress}
 
@@ -265,9 +274,9 @@ hand-crafted baseline. State the target-group labelling budget if claiming a per
 \section*{Reproducibility and LLM use}
 
 All code, cached results and figures are available at \textcolor{red}{[ANONYMISED MIRROR URL]}. Every
-experiment runs on a CPU laptop; total compute is zero GPU-hours. Datasets are public: CatMeows
-(Zenodo 4008297, CC-BY-4.0), dog barks \citep{molnar2008}, Soundwel (Zenodo 8252482, CC-BY-4.0), and
-Egyptian fruit bats \citep{prat2017}. \textcolor{red}{[LLM-use disclosure required by the venue: state
+experiment runs on a CPU laptop; total compute is zero GPU-hours. Datasets are public: CatMeows \citep{ludovico2021,ntalampiras2019} (Zenodo 4008297, CC-BY-4.0), dog
+barks \citep{molnar2008}, Soundwel \citep{briefer2022} (Zenodo 8252482, CC-BY-4.0), and Egyptian
+fruit bats \citep{prat2017}. \textcolor{red}{[LLM-use disclosure required by the venue: state
 here how LLM assistance was used in experimentation, analysis and writing.]}
 
 \bibliographystyle{plainnat}
