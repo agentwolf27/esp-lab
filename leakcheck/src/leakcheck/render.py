@@ -125,36 +125,58 @@ def to_markdown(r) -> str:
 
 # --------------------------------------------------------------------- html
 _CSS = """
-:root{--bg:#ffffff;--fg:#14181d;--mut:#5d6874;--line:#e2e6eb;--card:#f7f8fa;
-      --sev:#c0392b;--mod:#b8860b;--low:#2e7d4f;--accent:#2f6fbd}
+/* Neutrals carry a slight slate bias toward the accent, so the greys read as
+   chosen rather than inherited. Semantic colours (severity) are deliberately
+   separate from the accent, which is reserved for "the mean". */
+:root{--bg:#f8f9fb;--card:#ffffff;--fg:#111721;--mut:#5a6675;--line:#dfe4ea;
+      --sev:#bc3b2e;--mod:#a8781a;--low:#2c7a53;--accent:#2f6fbd}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-      --bg:#101418;--fg:#e6e9ed;--mut:#98a2ad;--line:#262c33;--card:#171c22;
-      --sev:#ef6f61;--mod:#e0b341;--low:#5fbf8a;--accent:#6fa8dc}}
-:root[data-theme="dark"]{--bg:#101418;--fg:#e6e9ed;--mut:#98a2ad;--line:#262c33;
-      --card:#171c22;--sev:#ef6f61;--mod:#e0b341;--low:#5fbf8a;--accent:#6fa8dc}
-body{background:var(--bg);color:var(--fg);margin:0;padding:2.5rem 1.25rem 5rem;
-     font:16px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,sans-serif}
-main{max-width:52rem;margin:0 auto}
-h1{font-size:1.6rem;margin:0 0 .25rem;letter-spacing:-.01em}
-h2{font-size:1.1rem;margin:2.5rem 0 .75rem;letter-spacing:-.005em}
-.sub{color:var(--mut);font-size:.9rem;margin:0 0 2rem}
-code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em}
-figure{margin:1.5rem 0;padding:1.25rem;background:var(--card);
-       border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+      --bg:#0e1216;--card:#151b22;--fg:#e4e8ee;--mut:#93a0af;--line:#232a33;
+      --sev:#ef7263;--mod:#dfb04a;--low:#5cbf88;--accent:#77abe2}}
+:root[data-theme="dark"]{--bg:#0e1216;--card:#151b22;--fg:#e4e8ee;--mut:#93a0af;
+      --line:#232a33;--sev:#ef7263;--mod:#dfb04a;--low:#5cbf88;--accent:#77abe2}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);margin:0;padding:0 1.25rem 5rem;
+     font:16px/1.62 ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,sans-serif;
+     -webkit-font-smoothing:antialiased}
+main{max-width:52rem;margin:0 auto;display:flex;flex-direction:column;gap:0}
+.stripe{height:4px;margin:0 -1.25rem 2.5rem;background:var(--line)}
+.stripe.SEVERE{background:var(--sev)}.stripe.MODERATE{background:var(--mod)}
+.stripe.LOW{background:var(--low)}
+.eyebrow{font-size:.68rem;font-weight:650;letter-spacing:.1em;text-transform:uppercase;
+     color:var(--mut);margin:0 0 .5rem}
+h1{font-size:1.75rem;line-height:1.2;margin:0 0 .6rem;letter-spacing:-.018em;text-wrap:balance}
+h2{font-size:.95rem;font-weight:650;letter-spacing:.02em;margin:2.75rem 0 .5rem;
+   padding-bottom:.4rem;border-bottom:1px solid var(--line)}
+.sub{color:var(--mut);font-size:.9rem;margin:0 0 1.75rem;line-height:1.7}
+code,.mono,td.num{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+     font-variant-numeric:tabular-nums}
+code{font-size:.85em;background:var(--card);border:1px solid var(--line);
+     border-radius:4px;padding:.08em .38em}
+figure{margin:1.25rem 0 0;padding:1.4rem 1.25rem;background:var(--card);
+       border:1px solid var(--line);border-radius:8px;overflow-x:auto}
 figure svg{display:block;max-width:100%;height:auto;color:var(--fg)}
-figcaption{color:var(--mut);font-size:.85rem;margin-top:.9rem;line-height:1.5}
-.verdict{border-left:3px solid var(--line);padding:.1rem 0 .1rem 1rem;margin:1rem 0}
-.badge{display:inline-block;padding:.2rem .6rem;border-radius:999px;font-size:.78rem;
-       font-weight:600;letter-spacing:.03em;color:#fff}
-.SEVERE{background:var(--sev)}.MODERATE{background:var(--mod)}.LOW{background:var(--low)}
-ul{padding-left:1.15rem}li{margin:.5rem 0}
-.warn li{color:var(--fg)}.warn li::marker{color:var(--mod)}
-table{border-collapse:collapse;width:100%;font-size:.9rem;margin-top:.5rem}
-th,td{text-align:left;padding:.45rem .6rem;border-bottom:1px solid var(--line)}
-th{color:var(--mut);font-weight:600}
-td.num{font-family:ui-monospace,Menlo,monospace;text-align:right}
+figcaption{color:var(--mut);font-size:.855rem;margin-top:1rem;line-height:1.6;
+       max-width:46rem}
+.badge{display:inline-block;padding:.18rem .55rem;border-radius:3px;font-size:.7rem;
+       font-weight:700;letter-spacing:.07em;color:var(--bg)}
+.badge.SEVERE{background:var(--sev)}.badge.MODERATE{background:var(--mod)}
+.badge.LOW{background:var(--low)}
+ul{padding-left:1.1rem;margin:.75rem 0 0}
+li{margin:.55rem 0;max-width:46rem}
+.verdict li::marker{color:var(--accent)}
+.warn li::marker{color:var(--mod)}
+table{border-collapse:collapse;width:100%;font-size:.885rem;margin-top:.75rem}
+th,td{text-align:left;padding:.42rem .6rem;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-size:.68rem;font-weight:650;letter-spacing:.08em;
+   text-transform:uppercase}
+td.num{text-align:right}
+tbody tr:last-child td{border-bottom:none}
+pre.mono{background:var(--card);border:1px solid var(--line);border-radius:8px;
+     padding:1rem 1.1rem;overflow-x:auto;font-size:.8rem;line-height:1.55;margin-top:.75rem}
 footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);
-       color:var(--mut);font-size:.82rem}
+       color:var(--mut);font-size:.8rem;line-height:1.65}
 """
 
 
@@ -266,14 +288,15 @@ def to_html(r) -> str:
     lf = r.leak_fraction
     frac = "" if not np.isfinite(lf) else \
         f" &middot; {max(0.0, min(1.0, lf)):.0%} of the apparent skill"
-    o = [f"<title>leakcheck &mdash; {html.escape(r.dataset)}</title>",
-         f"<style>{_CSS}</style>", "<main>",
+    o = [f"<title>{html.escape(r.dataset)}</title>",
+         f"<style>{_CSS}</style>", f'<div class="stripe {r.level}"></div>', "<main>",
+         '<p class="eyebrow">leakcheck report</p>',
          f"<h1>{html.escape(r.dataset)}</h1>",
-         f'<p class="sub"><span class="badge {r.level}">{r.level}</span> '
-         f'inflation {r.inflation:+.3f}{frac} &middot; '
+         f'<p class="sub"><span class="badge {r.level}">{r.level}</span>&nbsp; '
+         f'inflation {r.inflation:+.3f}{frac}<br>'
          f'<code>label={html.escape(r.label_name)}</code> '
          f'<code>group={html.escape(r.group_name)}</code> &middot; '
-         f'{r.design.n_clips} clips, {r.design.n_classes} classes, '
+         f'{r.design.n_clips:,} clips &middot; {r.design.n_classes} classes &middot; '
          f'{r.design.n_groups} groups</p>',
          "<figure>", _svg_three_numbers(r),
          f"<figcaption>The same features and the same probe, scored two ways. "
