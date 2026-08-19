@@ -109,7 +109,13 @@ and the encoders evaluated on them \citep{hagiwara2023aves,miron2026avex} largel
 pre-specified splits, and \citet{schwinger2026} show calibration varies sharply across datasets.
 Notably, the ingredients of our claim already appear unremarked: \citet{abzaliev2024} report dog
 individual-ID at 0.50 against 0.05 chance alongside context classification at 0.62 against a 0.56
-baseline, without commenting on the disparity.
+baseline, without commenting on the disparity. The same encoders are now being turned on identity as
+a task: \citet{chauhan2025} fine-tune a bioacoustic encoder into a 173-way individual classifier for
+wild zebra finches, splitting by clip, so recordings made in the same tree on the same day fall on
+both sides. That is the conventional design for a closed-set task, but it leaves the day and the
+recorder untested; the companion field study from the same group \citep{hagedoorn2025} reports
+embedding distances that are lower for recordings sharing an hour even between different individuals.
+The confound is visible in that system without yet being carried into the evaluation.
 
 \paragraph{Conformal prediction.}
 Split conformal prediction is due to \citet{vovk2013}; see \citet{angelopoulos2023} for a modern
@@ -218,6 +224,18 @@ The corpus documentation contains both halves of the problem: the protocol trans
 in a different apartment or an office'' for the isolation condition, while the methods section states
 room characteristics ``should not affect the captured audio signals'' \citep{ntalampiras2019}.
 
+Pushed to its limit the same test discards the audio entirely, and for identity it can be run on
+metadata alone. The corpus our bat clips are drawn from \citep{prat2017} publishes a file table
+giving every recording a timestamp, a microphone channel and a treatment period; across its 83{,}222
+annotated calls with an identified emitter (82 emitters, 345 days, 12 channels), Cram\'er's $V$
+between emitter and microphone channel is 0.589, which is also what we measure between pig valence and
+recording lab (0.59). Channel and date together, with nothing acoustic, identify the emitter at 0.297
+against a 0.012 chance rate. Bats roost in fixed positions, so \emph{which bat} and \emph{which
+microphone} are close to the same question. We cannot transfer this onto our own bat numbers: the
+benchmark packaging we use renumbers file identifiers and does not join to the annotation table
+(emitter agreement 0.1\%), so we do not know which subset we hold. The observation is about the
+recording design our identity number inherits, not about that number.
+
 \section{Channel robustness}\label{sec:stress}
 
 Perturbing the same clips and counting decision flips against probes trained on clean audio: at layer
@@ -280,7 +298,11 @@ of six labs contribute a single valence class, the lab identifier alone predicts
 above the 0.654 an encoder earns honestly --- and no behavioural context is shared across all six
 labs, so leave-one-lab-out there conflates site shift with label-distribution shift and context
 novelty. Only four labs are scorable and the baseline 95\% CI is [0.526, 0.725]. The pig numbers,
-including the eGeMAPS comparison, should be read with that caveat. The cross-corpus correlation is underpowered ($n{=}12$). Probes are linear and
+including the eGeMAPS comparison, should be read with that caveat. \textbf{Our identity numbers are diagnostics, not task results.} Each is measured under a random
+split by design, because what a context probe can borrow is identity as it is available at training
+time. Read instead as a claim about how well these encoders identify animals, the same numbers would
+be inflated by exactly the effect this paper documents. Where identity is the task, the session, the
+recorder or the day has to be held out, and we do not do that here. The cross-corpus correlation is underpowered ($n{=}12$). Probes are linear and
 best layers are selected post hoc; we report selection-free means alongside. Extreme per-group
 conformal minima come partly from small groups: restricted to cats with $n\geq10$ the worst is 0.748
 and 3/15 fall below 0.80.

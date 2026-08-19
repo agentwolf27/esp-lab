@@ -1,0 +1,18 @@
+{
+  "pigs_valence_vs_lab": {
+    "n": 5031,
+    "n_labels": 2,
+    "n_groups": 6,
+    "cramers_v": 0.5908685677192634
+  },
+  "bats_emitter_vs_recording_unit": {
+    "n": 83222,
+    "n_labels": 82,
+    "cramers_v_emitter_vs_channel": 0.5889169804448148,
+    "cramers_v_emitter_vs_treatment": 0.5940367937065707,
+    "cramers_v_emitter_vs_day": 0.2451538128535791,
+    "guess_emitter_from_channel": 0.17459325659080532,
+    "guess_emitter_from_channel_and_day": 0.2973252265026075,
+    "chance": 0.012195121951219513
+  }
+}
