@@ -188,6 +188,17 @@ Pooling all points, identity decodability correlates with the inflation gap at $
 artifact (neural-only $r{=}0.694$). Identity tracks the \emph{leaky} number ($r{=}0.754$) more than
 the honest one ($r{=}0.509$), as the leakage account requires.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/inflation_law.png}
+  \caption{Each point is one (dataset, feature set, layer). \textbf{Left:} the better a feature set
+  identifies the animal, the more a random split flatters it. \textbf{Right:} the same points with
+  each dataset centred on its own mean---the relationship holds \emph{within} all three corpora
+  (cats $r{=}0.71$, dogs $r{=}0.59$, pigs $r{=}0.59$). Across corpus means it does not
+  ($r{=}0.221$, $n{=}12$), which is the scope we claim.}
+  \label{fig:inflation}
+\end{figure}
+
 \paragraph{The limit.} Across the 12 independent dataset\,$\times$\,feature-set units the correlation
 is $r{=}0.221$ ($p{=}0.489$). At $n{=}12$ this test has roughly 15\% power, so we state that we
 \emph{do not detect} a cross-corpus relationship, not that none exists.
@@ -245,7 +256,29 @@ unmatched comparison exaggerates the ratio to 2.7--6.1$\times$. Individual ident
 spectral detail, affect in coarse envelope structure. This also constrains the previous section: if
 the context signal were purely room acoustics, reverb would scramble it, and it does not.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/stress.png}
+  \caption{Decision flips when the same clips are perturbed, against probes trained on clean audio.
+  \textbf{Right:} the ratio uses a \emph{difficulty-matched} binary identity probe, so the comparison
+  is not confounded by task difficulty; the unmatched version exaggerates it to 2.7--6.1$\times$.
+  Identity is the fragile signal, and most fragile under bandwidth loss---consistent with individual
+  identity living in fine spectral detail and affect in coarse envelope structure.}
+  \label{fig:stress}
+\end{figure}
+
 \section{The guarantees break too}\label{sec:conformal}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/coverage_paper.png}
+  \caption{Split conformal at $\alpha{=}0.10$, calibrated on other individuals or labs and tested on
+  a held-out one---the deployment case. One dot per group, area proportional to clip count. Marginal
+  coverage lands on the 0.90 target in all three corpora; the guarantee is marginal, and the animal
+  is not. The group-conditional (Mondrian) remedy is unavailable here by construction: a group that
+  is held out has no calibration data of its own.}
+  \label{fig:coverage}
+\end{figure}
 
 \begin{table}[t]
 \caption{Split conformal at $\alpha{=}0.10$ (nominal coverage 0.90), calibrated and tested by group.}
@@ -288,6 +321,16 @@ from the target lab close 50.2\% of the gap and the curve is still climbing. On 
 \emph{starts} ahead (0.677 vs.\ 0.654 at $k{=}0$) but gains only $+$0.027 from 100 clips against
 WavLM's $+$0.115: the encoder is more \emph{adaptable}, not more \emph{transferable}.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/recovery.png}
+  \caption{Labelled clips from the held-out group, added back into training. The individual gap is
+  cheap to close and saturates (cats, $k{\approx}11$); the site gap is not (pigs, 100 clips close
+  half of it and the curve is still climbing). Ecologists move recorders between sites far more often
+  than they change animals, so the expensive case is the common one.}
+  \label{fig:recovery}
+\end{figure}
+
 \section{Limitations}
 
 One encoder family dominates; AVES is the only bioacoustic encoder tested at scale. Bats have no
@@ -318,8 +361,15 @@ hand-crafted baseline. State the target-group labelling budget if claiming a per
 All code, cached results and figures are available at \textcolor{red}{[ANONYMISED MIRROR URL]}. Every
 experiment runs on a CPU laptop; total compute is zero GPU-hours. Datasets are public: CatMeows \citep{ludovico2021,ntalampiras2019} (Zenodo 4008297, CC-BY-4.0), dog
 barks \citep{molnar2008}, Soundwel \citep{briefer2022} (Zenodo 8252482, CC-BY-4.0), and Egyptian
-fruit bats \citep{prat2017}. \textcolor{red}{[LLM-use disclosure required by the venue: state
-here how LLM assistance was used in experimentation, analysis and writing.]}
+fruit bats \citep{prat2017}. \paragraph{LLM use.} A large language model was used throughout this work as a coding and drafting
+assistant: implementing the experiments, writing the analysis and plotting scripts, searching and
+summarising related work, and drafting and revising this text. It was also used adversarially, to
+attack our own claims; several results reported here were withdrawn or rescoped as a result, and one
+error that survived into an earlier draft---an artefactual below-chance figure caused by imputing
+clips absent from a published feature table---was found that way and is reported in
+\S\ref{sec:baseline}. Every number in this paper is produced by committed code and checked against
+its stored JSON output; every reference was verified against the publisher or a bibliographic
+database before citation. The authors take full responsibility for all claims.
 
 \bibliographystyle{plainnat}
 \bibliography{refs}

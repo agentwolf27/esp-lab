@@ -7,18 +7,23 @@ non-archival · OpenReview · concurrent submission allowed · LLM-use disclosur
 - [ ] **Anonymised mirror.** Run `bash paper/anonymise.sh` → `../esp-lab-anon/` (verified clean).
       Upload to anonymous.4open.science, then replace `[ANONYMISED MIRROR URL]` in `paper_a.tex`.
       *Anonymity extends to linked material — the public repo cannot be cited.*
-- [ ] **Verify 3 references** marked `[VERIFY]` in `refs.bib` (Lin 2026 EEG, Tang 2023, Ghani 2026
-      author list) against `paper/RELATED_WORK.md`.
-- [ ] **LLM-use disclosure** — the venue requires it. Be specific and honest: LLM assistance was used
-      for experiment implementation, analysis scripting, literature search and drafting; all numbers
-      were produced by committed code and verified against the JSON outputs.
+- [ ] **Verify 3 references** (Lin 2026 EEG, Tang 2023, Ghani 2026 author list). The `[VERIFY]`
+      markers are no longer in `refs.bib`; confirm against `paper/REFS_AUDIT.md` whether that means
+      they were checked or the markers were dropped. `chauhan2025` and `hagedoorn2025` (added
+      18 Aug) were verified against Europe PMC.
+- [x] **LLM-use disclosure** — written into `paper_a.tex` (§ Reproducibility and LLM use), including
+      the adversarial use and the below-chance error it caught. Read it once and confirm you are
+      comfortable signing it.
 - [ ] **Compile.** No TeX locally (and TeX Live would use most of the free disk). Upload
       `paper_a.tex` + `template/neurips_2026.sty` + `figures/` to Overleaf.
 - [ ] **Check page count** ≤ 8 after figures go in; cut §5 or §7 first if over.
 
 ## Should do
-- [ ] Insert figures: `audit_table.png`, `inflation_law.png`, `coverage.png`, `recovery.png`,
-      `stress.png`, `room.png`, `layers.png` (7 available; pick 4–5 that fit).
+- [x] Insert figures — 4 in: `inflation_law` (§4.2), `stress` (§5), `coverage_paper` (§6),
+      `recovery` (§7). `coverage.png` was a 5×4 exploration grid, unreadable at this width;
+      `experiments/conformal_eval/paper_figure.py` regenerates the one panel the claim rests on as
+      `figures/coverage_paper.png`. **Check the page count after compiling** — drop `stress` first
+      if over, its section is three sentences.
 - [ ] A domain reader — someone who knows bioacoustics — on §4.4 and §8.
 - [ ] Decide author list / affiliation (independent researcher is fine and honest).
 - [ ] arXiv endorsement for cs.SD **if** preprinting — takes days for an independent researcher, and
