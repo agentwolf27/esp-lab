@@ -1163,3 +1163,91 @@ us the contaminant. Both readings are correct and they are the same number, whic
 for the outreach email than anything we had.
 
 Code `leakcheck/`; tests `leakcheck/tests/`; report cards write to HTML, Markdown or JSON.
+
+---
+
+# ITERATION 17 — the video was not what we thought, and the paper got a caveat it needed
+
+*18 Aug 2026. Six-agent research pass on the "see bird conversations" Short. Raw reports in
+`research/bird-viz-research-2026-08-18-raw.md` (private); synthesis in the sibling file.*
+
+## The attribution correction
+
+The Short is **not** Earth Species Project. It is **Lucio Arese's** TouchDesigner data-art project
+*Seeing Birdsong*, re-uploaded by a clip channel with AI narration added. Chronology settles it: the
+Short is 16 Nov 2025; the BirdAVES preprint is 20 Nov 2025 and the ESP blog 5 May 2026. Arese's own
+posts say the "aligned manifold" is "computed from MFCC data" and the two robins were recorded on one
+microphone and "separated by the differences in amplitude and reverb" — by hand. No model, no learned
+embedding, no network. I had told Vish it was the ESP work; that was wrong.
+
+What it actually plots: 3-D scatters of low-level spectral descriptors (flatness/slope/centroid/
+spread/entropy), a five-axis radar "vocal signature", and two MFCC trajectories that "touch" where
+timbre is similar. Those are the **eGeMAPS family** — the same hand-crafted descriptors that match
+WavLM under honest evaluation on pigs while leaking less identity. The artist and our audit arrive at
+the same features from opposite directions.
+
+## What ESP actually publishes
+
+Blog + preprint (Chauhan, Loning, ter Avest, Botta) between them contain **two visuals**: a 2×2 t-SNE
+of mean-pooled BirdAVES embeddings before vs after fine-tuning, and Top-k retrieval curves with a
+per-class box plot. One figure and two tables in the preprint. **No who-sang-when timeline and no
+network graph exist anywhere** — both appear only in prose. Split, verbatim: *"We split the dataset
+by clip (identities may appear in multiple partitions…)"*, over four recorders in four hotspot trees,
+18 recorder-days. No data or code availability statement.
+
+Their companion ecology paper (Hagedoorn et al. 2025) draws the association network from **manual**
+IDs and reports embedding distances lower for same-hour recordings *even across individuals*. The
+session confound is visible to that group and has not been carried into the classifier evaluation.
+
+Also worth recording: ESP's own AVES supervised Colab splits **by individual** — the honest split —
+for call type. They never place it beside a random split, which is the gap `leakcheck` fills.
+
+## The result that came out of the metadata
+
+`experiments/bats_session/network_error_sim.py`. Two synthetic identity classifiers at the **same**
+realised accuracy on the 70,001 emitter→addressee calls; one errs to a random bat, the other to the
+bat that usually sits at that microphone that day.
+
+| accuracy | uniform: strong spurious edges / top-50 Jaccard | microphone-shaped |
+|---|---|---|
+| 0.90 | 0 / 1.00 | 5 / 1.00 |
+| 0.70 | 0 / 1.00 | 28 / 0.89 |
+| 0.50 | 0 / 0.96 | 48 / 0.56 |
+
+Uniform error is fog: many weak wrong edges, headline edges intact. Leakage-shaped error is **bias**,
+and it lands on the strong edges — the pairs a biologist would report as a relationship. Worse, the
+microphone-shaped model scores *higher* on global edge-weight correlation (0.585 vs 0.425), so a
+single summary statistic prefers the corrupted network. This is the metadata argument for running the
+audio version; it is not itself the finding.
+
+## What went into Paper A
+
+Three defensive edits (commit `f66666a`), all closing an attack our own tool aimed at us:
+
+1. **§4.3** now pushes the background probe to its limit — discard the audio entirely. Cramér's V
+   between bat emitter and microphone channel is **0.589**, the same 0.59 we measure between pig
+   valence and recording lab, now computed by one shared function
+   (`experiments/bats_session/label_group_association.py`) so the two are comparable. Channel and
+   date alone identify the emitter at **0.297** against 0.012 chance. Stated with its limit: the
+   BEANS packaging renumbers file IDs and will not join (emitter agreement 0.1%), so this is about
+   the recording design our number inherits, not our number.
+2. **Limitations** now says plainly that **every identity figure in the paper is a diagnostic, not a
+   task result** — measured under a random split by design, because what a context probe can borrow
+   is identity as available at training time. Read as a claim about identification accuracy, those
+   numbers would be inflated by the very effect the paper documents.
+3. **Related work** cites Chauhan et al. 2025 and Hagedoorn et al. 2025, framed as *untested across
+   days and recorders*, never as "leaky": their split is the conventional design for a closed-set
+   task and their data are not public, so we cannot audit it. Both verified against Europe PMC first.
+
+## What we are not doing
+
+Not adopting the art idiom (radar charts, "ribbons touching") — importing the visual language imports
+the identity/context confusion. Not adopting the before/after-fine-tuning t-SNE: our thesis is about
+*frozen* encoders, and blob tightness is a parameter. Any embedding map we publish computes every
+statistic in the original space, prints the three leakcheck numbers underneath, and carries a
+permuted-label null — otherwise it is decoration.
+
+Queued after the 29 Aug deadline: the full-corpus bat identity audit (random / day / mic / day+mic
+held out, plus a Stowell-style background-only test), then the predicted-vs-annotated network with
+error propagation. The cluster is needed for the ~95 GB download and one embedding pass; everything
+after that is laptop work.
