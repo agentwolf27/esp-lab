@@ -1,0 +1,205 @@
+{
+ "passing": [
+  33
+ ],
+ "per_species_selective_counts": {
+  "cat": {
+   "observed": 9,
+   "null_mean": 3.34,
+   "null_sd": 1.4122223122782342,
+   "null_max": 9,
+   "p": 0.009950248756218905
+  },
+  "dog": {
+   "observed": 10,
+   "null_mean": 0.05,
+   "null_sd": 0.24039331256010033,
+   "null_max": 2,
+   "p": 0.004975124378109453
+  },
+  "pig": {
+   "observed": 0,
+   "null_mean": 0.0,
+   "null_sd": 0.0,
+   "null_max": 0,
+   "p": 1.0
+  }
+ },
+ "best_atom_per_species": {
+  "cat": {
+   "component": 11,
+   "auc": 0.2613033099369366,
+   "auc_other_species": {
+    "cat": 0.2613033099369366,
+    "dog": 0.5331786767193466,
+    "pig": 0.5016256013470042
+   }
+  },
+  "dog": {
+   "component": 117,
+   "auc": 0.7624087767628438,
+   "auc_other_species": {
+    "cat": 0.5047208465457655,
+    "dog": 0.7624087767628438,
+    "pig": 0.5251747978722741
+   }
+  },
+  "pig": {
+   "component": 1,
+   "auc": 0.5797597007036535,
+   "auc_other_species": {
+    "cat": 0.5031175401717319,
+    "dog": 0.542119762215456,
+    "pig": 0.5797597007036535
+   }
+  }
+ },
+ "component_detail": {
+  "33": {
+   "auc": {
+    "cat": 0.2993194855167991,
+    "dog": 0.334324102266686,
+    "pig": 0.5223456822932405
+   },
+   "within_animal_auc": {
+    "cat": 0.37151016718324414,
+    "dog": 0.350577208791972,
+    "pig": 0.5071350592085091
+   },
+   "per_animal": {
+    "cat": {
+     "cat_ANI01": 0.0,
+     "cat_BAC01": 0.452,
+     "cat_BRA01": 0.171,
+     "cat_CAN01": 0.398,
+     "cat_DAK01": 0.422,
+     "cat_MAG01": 0.5,
+     "cat_MAT01": 0.435,
+     "cat_MIN01": 0.479,
+     "cat_NUL01": 0.325,
+     "cat_SPI01": 0.45,
+     "cat_WHO01": 0.306
+    },
+    "dog": {
+     "dog_Farley": 0.364,
+     "dog_Freid": 0.401,
+     "dog_Keri": 0.375,
+     "dog_Louie": 0.352,
+     "dog_Luke": 0.412,
+     "dog_Mac": 0.364,
+     "dog_Roodie": 0.423,
+     "dog_Rudy": 0.219,
+     "dog_Siggy": 0.328,
+     "dog_Zoe": 0.155
+    },
+    "pig": {
+     "ETHZ": 0.57,
+     "FBN": 0.465,
+     "IASPA": 0.505,
+     "NMBU": 0.52
+    }
+   },
+   "n_animals_scored": {
+    "cat": 11,
+    "dog": 10,
+    "pig": 4
+   },
+   "cos_atom_affect_dir": {
+    "cat": -0.29336024538005034,
+    "dog": -0.45544356161305954,
+    "pig": -0.027615382871370064
+   },
+   "mean_activation_by_context": {
+    "cat": {
+     "B": 2.482,
+     "I": 0.546
+    },
+    "dog": {
+     "aggression": 0.278,
+     "play": 1.282
+    },
+    "pig": {
+     "AfterNursing": 0.221,
+     "Barren": 0.278,
+     "BeforeNursing": 0.142,
+     "Castration": 0.428,
+     "Crushing": 0.183,
+     "Enriched": 0.219,
+     "Fighting": 0.123,
+     "Huddling": 0.133,
+     "Isolation": 0.226,
+     "MissedNursing": 0.326,
+     "NegativeConditioning": 0.33,
+     "NovelObject": 0.193,
+     "PositiveConditioning": 0.325,
+     "Restrain": 0.248,
+     "Reunion": 0.134,
+     "Run": 0.201,
+     "Surprise": 0.183
+    }
+   }
+  }
+ },
+ "ica_passing": [
+  51
+ ],
+ "ica_vs_dict": {
+  "dict33_vs_ica51": {
+   "spearman": -0.0005043619073666349,
+   "pearson": -0.018936574707410076,
+   "cos_dictatom_vs_ica_readout": 0.008499967563040736,
+   "ica_auc": {
+    "cat": 0.600384793529768,
+    "dog": 0.6276158716350104,
+    "pig": 0.4948243884658175
+   },
+   "cos_ica_readout_affect_dir": {
+    "cat": 0.03072534647989871,
+    "dog": 0.04803044287721349,
+    "pig": -0.03661690866572866
+   }
+  }
+ },
+ "balanced_near_misses": [
+  {
+   "component": 161,
+   "auc": [
+    0.414,
+    0.58,
+    0.49
+   ]
+  },
+  {
+   "component": 3,
+   "auc": [
+    0.423,
+    0.417,
+    0.489
+   ]
+  },
+  {
+   "component": 123,
+   "auc": [
+    0.436,
+    0.571,
+    0.5
+   ]
+  },
+  {
+   "component": 129,
+   "auc": [
+    0.423,
+    0.438,
+    0.504
+   ]
+  },
+  {
+   "component": 7,
+   "auc": [
+    0.56,
+    0.493,
+    0.426
+   ]
+  }
+ ]
+}

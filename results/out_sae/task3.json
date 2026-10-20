@@ -1,0 +1,118 @@
+{
+ "layer": 9,
+ "n_pooled": 5687,
+ "n_per_species": {
+  "cat": 348,
+  "dog": 308,
+  "pig": 5031
+ },
+ "method": "sklearn MiniBatchDictionaryLearning, fit_algorithm='cd' (positive codes are not supported by the default 'lars' fit), transform_algorithm='lasso_lars', positive_code=True",
+ "n_components": 192,
+ "alpha": 1.0,
+ "n_perm": 200,
+ "criterion": "AUC > 0.6 or < 0.4 in >=2 species, same sign",
+ "runtime_s": 12.9,
+ "active_atoms_per_sample": 33.716194830314755,
+ "variance_explained": 0.6863529229882535,
+ "frac_nonzero_per_species": {
+  "cat": 0.16566391283524903,
+  "dog": 0.15674039502164502,
+  "pig": 0.17744774067448485
+ },
+ "n_pass_2species": 1,
+ "n_pass_3species": 0,
+ "null_pass_2species": {
+  "mean": 0.0,
+  "sd": 0.0,
+  "max": 0,
+  "p": 0.004975124378109453
+ },
+ "null_pass_3species": {
+  "mean": 0.0,
+  "sd": 0.0,
+  "max": 0,
+  "p": 1.0
+ },
+ "components": [
+  {
+   "component": 33,
+   "auc": {
+    "cat": 0.2993194855167991,
+    "dog": 0.334324102266686,
+    "pig": 0.5223456822932405
+   },
+   "frac_active": {
+    "cat": 0.3994252873563218,
+    "dog": 0.37012987012987014,
+    "pig": 0.22341482806599086
+   },
+   "n_species_pass": 2,
+   "sign": "pos-high",
+   "spearman": {
+    "cat": {
+     "log_dur": -0.1663239812445863,
+     "log_energy": -0.0809353365135658,
+     "centroid": 0.052777620852659926,
+     "zcr": 0.05277794255953173
+    },
+    "dog": {
+     "log_dur": 0.021988210440170058,
+     "log_energy": 0.13014966533677247,
+     "centroid": 0.15295729099571323,
+     "zcr": 0.15460545702765952
+    },
+    "pig": {
+     "log_dur": 0.089865303145878,
+     "log_energy": 0.0521202016965986,
+     "centroid": -0.028183126426095287,
+     "zcr": -0.02453207284003564
+    }
+   },
+   "auc_dur_controlled": {
+    "cat": 0.3397049916271778,
+    "dog": 0.2941617128219999,
+    "pig": 0.4223884651613265
+   },
+   "auc_acoustics_controlled": {
+    "cat": 0.39184807781380276,
+    "dog": 0.4084384515006525,
+    "pig": 0.4340904326155063
+   },
+   "partial_spearman_affect_given_acoustics": {
+    "cat": -0.3587138738002427,
+    "dog": -0.261973952601109,
+    "pig": 0.02081094097768527
+   },
+   "p_perm_two_sided": {
+    "cat": 0.004975124378109453,
+    "dog": 0.004975124378109453,
+    "pig": 0.0845771144278607
+   },
+   "null_auc_sd": {
+    "cat": 0.02392877035255055,
+    "dog": 0.027010585395851164,
+    "pig": 0.004996596177383789
+   }
+  }
+ ],
+ "fastica": {
+  "n_components": 64,
+  "n_pass_2species": 1,
+  "n_pass_3species": 0,
+  "pass_ids": [
+   51
+  ],
+  "auc_of_passing": {
+   "51": [
+    0.600384793529768,
+    0.6276158716350104,
+    0.4948243884658175
+   ]
+  }
+ },
+ "balanced_dict": {
+  "n_pass_2species": 0,
+  "n_pass_3species": 0,
+  "pass_ids": []
+ }
+}

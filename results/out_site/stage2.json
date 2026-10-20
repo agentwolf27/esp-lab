@@ -1,0 +1,83 @@
+{
+ "shift_decomposition": {
+  "LOTO_lab": [
+   0.6537141861625637,
+   5031
+  ],
+  "LOCO_context": [
+   0.5686364830907604,
+   5031
+  ],
+  "LOCO_within_lab": {
+   "FBN": 0.8104575163398693,
+   "IASPA": 0.6722032365696504,
+   "NMBU": 0.5967336683417085
+  },
+  "LOCO_within_lab_mean": 0.6931314737504094
+ },
+ "rff": {
+  "RFF (no erasure)": {
+   "valence_loto": 0.6142528959638104,
+   "lab_acc": 0.9236732259988074,
+   "lab_bacc": 0.9155131991127873,
+   "lab_mlp": 0.9348042138739813,
+   "lab_mlp_bacc": 0.9255297951603682,
+   "secs": 16.3
+  },
+  "RFF + LEACE": {
+   "valence_loto": 0.5654179252999312,
+   "lab_acc": 0.291393361160803,
+   "lab_bacc": 0.16666666666666666,
+   "lab_mlp": 0.9006161796859471,
+   "lab_mlp_bacc": 0.8779087933612618,
+   "secs": 24.3
+  },
+  "RFF + LEACE-T": {
+   "valence_loto": 0.515074809322597,
+   "lab_acc": 0.05843768634466309,
+   "lab_bacc": 0.036286170792316164,
+   "lab_mlp": 0.885311071357583,
+   "lab_mlp_bacc": 0.8410265907945685,
+   "secs": 27.2
+  }
+ },
+ "entanglement": {
+  "lab_subspace_rank": 5,
+  "valence_dir_in_lab_subspace": 0.036439698189496994,
+  "random_dir_in_lab_subspace_expected": 0.08068715304598785,
+  "overlap_vs_random": 0.45161710153198853,
+  "valence_loto_site_subspace_only": 0.7183267338134595,
+  "valence_loto_complement": 0.551080579104178,
+  "valence_loto_full": 0.6537141861625637
+ },
+ "subspace_decomposition": {
+  "site_subspace_only_inductive": 0.6070502656048379,
+  "site_subspace_dim_inductive": 4,
+  "complement_inductive": 0.6566832319044709,
+  "random_subspace_only_matched_dim": 0.5293423216727051,
+  "random_subspace_only_sd": 0.05532102534963964,
+  "site_subspace_only_transductive": 0.7183267338134595,
+  "site_subspace_dim_transductive": 5,
+  "full": 0.6537141861625637
+ },
+ "site_subspace_probe": {
+  "full": 0.6636111779426976,
+  "full_per_lab": {
+   "ETHZ": 0.6811403508771929,
+   "FBN": 0.5406162464985994,
+   "IASPA": 0.7552694657664689,
+   "NMBU": 0.5121526435596787
+  },
+  "site_T": 0.6875020563565064,
+  "site_T_per_lab": {
+   "ETHZ": 0.8089912280701754,
+   "FBN": 0.4977591036414566,
+   "IASPA": 0.7097531528391339,
+   "NMBU": 0.47919941588283294
+  },
+  "rand5_mean": 0.6159175102869234,
+  "rand5_sd": 0.05087523249674588,
+  "rand5_max": 0.714350618037948,
+  "site_T_dim": 5
+ }
+}

@@ -381,9 +381,13 @@ generalisation. This is a reframing, not a refutation.)
 | WavLM | 0.631 (mean 0.561) | **0.700** (mean 0.615) |
 | AVES-bio | 0.651 (mean 0.629) | 0.681 (mean 0.670) |
 
-Identity dominance is **not a domestic-animal quirk**. And a free 4× time-stretch, which folds
-ultrasonic content into the encoder's band, improves identity by +7 pts (WavLM) — a small positive
-result on ESP's own bandwidth problem (#6). No context labels in the BEANS packaging (see iteration 2).
+Identity dominance is **not a domestic-animal quirk**. And a 4× time-stretch, which folds ultrasonic
+content into the encoder's band, improves identity by +7 pts (WavLM).
+**Correction (17 Aug):** this is the *time-expansion baseline* that ESP's own multiband paper (Sarkar
+et al. 2026, arXiv 2604.27936, `earthspecies/multiband-audio`) is designed to beat — a known technique,
+not a new result. Honest framing: we reproduced the time-expansion effect on a wild species with a
+speech encoder. The natural next step is to run their heterodyne-and-fuse method on the same 2,000
+calls and see if it beats 0.700. No context labels in the BEANS packaging (see iteration 2).
 
 ## The 3×3 transfer matrix (WavLM, mean over layers, group-level permutation)
 
@@ -464,3 +468,698 @@ If dog→cat holds there too, it is a property of frozen encoders generally; if 
 property (which would itself be interesting — speech pretraining as the carrier).
 
 ## eGeMAPS added to Paper A (see above): honest handcrafted baseline 0.486; encoders +0.07–0.09 over it.
+
+## AVES-bio (third encoder family — bioacoustic, not speech) — the 3×3
+
+| cell | WavLM | HuBERT | AVES-bio |
+|---|---|---|---|
+| dog→cat | **0.583 (p=.015)** | 0.561 (p=.060) | 0.537 (p=.23) |
+| pig→cat | **0.591 (p=.005)** | 0.530 (p=.23) | **0.608 (p=.040)** |
+| cat→pig | 0.524 (p=.10) | 0.523 (p=.14) | **0.559 (p=.040)** |
+| pig→dog | 0.523 (p=.25) | 0.493 (p=.55) | 0.565 (p=.085) |
+| cat→dog | 0.527 (p=.59) | — | 0.456 (p=.78) |
+| dog→pig | 0.495 (p=.56) | — | 0.469 (p=.82) |
+| placebo (sex→affect) | 0.51 | — | 0.487 |
+| pig within, held-out lab | 0.660 | 0.628 | **0.679** |
+
+**Reading.** No cell is significant in all three encoders. **pig→cat is significant in two of three**
+(WavLM, AVES); dog→cat in one plus a borderline. Every encoder finds at least one species pair that
+transfers *into cats* above chance, but *which* pair differs. AVES — a bioacoustic model — is the only
+one where anything transfers *out* of cats (cat→pig 0.559). Placebos stay at chance in all.
+
+Honest Paper-B sentence, final form:
+> *Across three frozen encoder families, an affect axis learned on one species predicts cat contexts
+> above chance in every encoder, but the specific source species that transfers is encoder-dependent
+> and no cell is unanimous; the effect is small, placebo-clean, roughly half explained by call duration,
+> and should be read as "encoders share some coarse arousal structure across mammals" rather than as
+> a stable cross-species code.*
+
+Figure: `figures/encoders3.png`. Data: `results/out_pigs/aves_matrix.json`, `encoder_consistency.json`.
+
+---
+
+# ITERATION 5 — channel stress test (E5): which axis survives deployment?
+
+Take the same 656 cat/dog clips, perturb the audio four ways, re-embed with WavLM, and ask probes
+trained on **clean** audio how often their decisions flip. This is the thesis question in miniature:
+deployment never matches the recording session.
+
+Layer 9, pooled cats+dogs, fraction of decisions that flip:
+
+| perturbation | context (binary) | identity, matched binary | identity, full 10–20-way | ratio (matched) |
+|---|---|---|---|---|
+| low-pass 4 kHz | **0.011** | 0.047 | 0.070 | **4.2×** |
+| reverb 0.4 s | 0.116 | 0.221 | 0.329 | 1.9× |
+| noise +10 dB SNR | 0.191 | 0.267 | 0.524 | 1.4× |
+| gain −12 dB | 0.000 | — | 0.000 | *(not informative — we z-normalise every waveform before the encoder, so gain is removed by construction)* |
+
+**The control mattered.** Raw identity is a 10–20-way task and context is binary, so identity has more
+boundaries to cross. Matching difficulty (predict which random half of the animals a clip came from,
+20 splits averaged) shrinks the effect from 2.7–6.1× to **1.4–4.2×** — but it does not remove it.
+
+**Reading.** *Context is the channel-robust axis; identity is channel-entangled* — clearly under
+bandwidth loss (context flips 1.1% when everything above 4 kHz is deleted), moderately under reverb,
+weakly and inconsistently under noise (ratio ≈1.0 at layers 3/6/12). Physically sensible: individual
+voice identity lives in fine spectral detail, affect in coarse envelope and duration.
+
+**It also pushes back on the room worry.** If the cat "context" signal were purely room acoustics,
+adding 0.4 s of reverb should scramble it. Context flips 11.6%; matched identity flips 22.1%. So the
+context axis is not simply an acoustic-environment readout — though the background-only result stands
+as a separate warning about *that particular dataset*.
+
+Caveat: probes are fit in-sample on clean audio, so these are decision-**stability** measures, not
+generalisation measures. That is the right design for counting flips; it is not an accuracy claim.
+
+Figure `figures/stress.png`; data `results/out_stress/`.
+
+---
+
+# ITERATION 6 — what actually carries the transfer (and what doesn't)
+
+Analysis on cached WavLM embeddings only (no audio): affect directions, 1-D projections, and sparse
+dictionary features across cat / dog / pig. Full detail `results/out_sae/`.
+
+## The naive "shared affect direction" hypothesis is FALSE
+
+Take each species' affect direction w_s = normalize(mean_negative − mean_positive) at layer 9 and
+compare them:
+
+| pair | cosine | null mean±SD (200 perms) | p |
+|---|---|---|---|
+| cat–dog | +0.188 | −0.142±0.194 | 0.065 |
+| cat–pig | +0.012 | −0.001±0.110 | 0.448 |
+| dog–pig | +0.004 | −0.005±0.111 | 0.488 |
+
+Nothing survives at layers 12 or 3 either (one p=0.045 out of 18 comparisons — that is what you expect
+by chance). **The species' affect directions are essentially orthogonal.**
+
+Crucially this is *not* a power problem for pigs: split-half reliability of w_s is cat 0.61, dog 0.41,
+**pig 0.94**. The pig direction is measured extremely precisely and it still points nowhere near the
+others. Cat–dog is attenuated by unreliability (correcting gives +0.374) but still sits inside the null.
+
+## So why does transfer work at all? Whitening.
+
+Transfer as a 1-D projection (AUC, layer 9): **dog→cat 0.790**, pig→cat 0.681, cat→dog 0.632,
+pig→dog 0.590, dog→pig 0.534, cat→pig 0.516. Same asymmetry as before — everything transfers *into*
+cats, nothing into pigs.
+
+The reconciliation: the **mean-difference** axis transfers much worse (dog→cat 0.616) than the
+**logistic probe** (0.790). The probe finds a direction in the covariance-whitened space, not the raw
+class-mean difference. So what is shared across species is not a direction in embedding space — it is
+a direction *relative to each species' own covariance structure*. That also explains the
+encoder-dependence we saw: whitened directions depend on the covariance, which differs per encoder.
+
+## Correction to the earlier "half of it is duration"
+
+Partialling log-duration out of the projection barely moves it (dog→cat 0.790 → 0.777). Where the
+transferred axis tracks a simple acoustic quantity, it is **energy**, not duration (pig→cat ρ=+0.544,
+dog→cat +0.344, cat→dog +0.337).
+
+This does not contradict the kill-test (duration alone transfers at 0.557 balanced accuracy) — both
+are true. Duration is *independently* predictive across species, but the embedding's transfer does not
+run *through* duration. Revised sentence: **duration is a parallel cross-species cue, not the mechanism.**
+
+One genuine oddity: the **pig affect direction essentially IS duration** — cos(w_pig, duration
+direction) = **+0.897**, and the pig affect score correlates with log-duration at ρ=+0.745. Yet pig
+duration does not align with cat/dog duration (+0.008 / −0.275), which is why pigs transfer poorly.
+
+## Sparse features: one shared feature in two species, none in three
+
+MiniBatchDictionaryLearning, 192 atoms, 13 s on CPU, 68.6% variance explained.
+
+- **0 of 192** atoms are affect-selective in all three species.
+- **1 of 192** in ≥2 species with the same sign (null 0.00±0.00 over 200 perms, p=0.005).
+- Per-species selective atoms: cat 9 (null 3.3±1.4), dog 10 (null 0.05±0.24), **pig 0**. The best
+  single pig atom reaches AUC 0.580 across 5,031 calls — pig valence is genuinely distributed, not
+  carried by any sparse feature.
+- **Component 33** (cat 0.299, dog 0.334, pig 0.522): *not* duration (ρ = −0.166/+0.022/+0.090),
+  survives the duration control and a full duration+energy+centroid control (0.392/0.408), and holds
+  when computed *within* each animal (all 10 dogs on the same side).
+- Robustness: FastICA(64) also finds 1-in-≥2 and 0-in-3 — but a *different, uncorrelated* feature
+  (ρ=−0.001). A species-balanced dictionary finds 0 passing.
+
+**Verdict:** there is no single sparse feature that means "distressed" across mammals. There is a
+weak, cat–dog-only shared structure, and it is not explained by the obvious acoustics.
+
+## What this does to Paper B
+
+It makes it a better and more honest paper. The claim is no longer "animals share an affect direction."
+It is: *frozen encoders support above-chance cross-species affect transfer into some species, but the
+shared structure is covariance-relative rather than a common direction, is absent for pigs despite a
+precisely-measured pig affect axis, and is not reducible to duration, energy or any single sparse
+feature.* That is a cautionary methods result about probing, which is exactly the ICBINB genre.
+
+---
+
+# ITERATION 7 — the leakage audit, done properly (Paper A's core)
+
+Four datasets × six feature sets × all layers, one protocol: held-out-group context accuracy vs
+random-split accuracy vs group-identity decodability. Full detail `results/out_audit/`.
+
+| dataset | features | held-out group | random | inflation | group identity | chance (task / id) |
+|---|---|---|---|---|---|---|
+| CatMeows | WavLM (L3) | 0.559 | 0.725 | +0.167 | 0.793 | .333 / .048 |
+| CatMeows | HuBERT (L12) | 0.571 | 0.671 | +0.099 | 0.700 | .333 / .048 |
+| CatMeows | wav2vec2 (L2) | 0.554 | 0.737 | +0.183 | 0.755 | .333 / .048 |
+| CatMeows | AVES-bio (L5) | 0.540 | 0.736 | +0.196 | 0.793 | .333 / .048 |
+| CatMeows | eGeMAPS-88 | 0.492 | 0.628 | +0.136 | 0.727 | .333 / .048 |
+| CatMeows | MFCC-85 | 0.399 | 0.602 | +0.203 | 0.768 | .333 / .048 |
+| Dog barks | WavLM (L6) | **0.728** | 0.878 | +0.150 | 0.817 | .333 / .100 |
+| Dog barks | eGeMAPS-88 | 0.619 | 0.733 | +0.114 | 0.792 | .333 / .100 |
+| Dog barks | MFCC-85 | 0.551 | 0.793 | +0.242 | 0.892 | .333 / .100 |
+| Dog barks | log-duration only | 0.341 | 0.360 | +0.018 | 0.222 | .333 / .100 |
+| Soundwel pigs | WavLM (L0) | 0.660 | 0.883 | +0.223 | **0.938** | .500 / .167 |
+| Soundwel pigs | eGeMAPS-88 | **0.669** | 0.823 | +0.153 | 0.865 | .500 / .167 |
+| Soundwel pigs | paper's 18 features | 0.386 | 0.575 | +0.189 | 0.513 | .500 / .167 |
+| BEANS bats (excluded) | WavLM (L11) | 0.301 | 0.303 | +0.003 | 0.394 | .250 / .100 |
+
+## The inflation law — real *within* a corpus, NOT across corpora
+
+- Pooled (n=83): Pearson **r=0.611, p=8.7e-10**; Spearman 0.610
+- Within-dataset partial: **r=0.646, df=79, p=7.1e-11**
+- Layer-only variation inside a single encoder (n=77): r=0.636, p=2.0e-9; **all six encoder clusters
+  positive** (sign test p=0.031)
+- Neural-only, 768-d (n=77): r=0.694 — not a dimensionality artifact
+- Leverage-safe: dropping the extreme point *raises* r to 0.670; jackknife keeps r ∈ [0.480, 0.689]
+- Identity tracks the **leaky** number (r=0.754) more than the honest one (r=0.509) — exactly what the
+  leakage account predicts
+- ⚠️ **Cluster level (12 independent dataset×feature-set units): r=0.221, p=0.489 — NULL**
+
+**Honest claim:** *among feature sets and layers for a given dataset, the one that leaks less identity
+inflates less.* **Not:** "datasets with more identity leakage inflate more." Earlier I reported the
+cats-only n=5 version (r=0.81, p=0.094); with n=6 it is r=0.866, p=0.026 — but the cross-corpus
+generalisation is not established and must not be claimed.
+
+## Three findings that change the story
+
+1. **eGeMAPS BEATS WavLM on pigs under held-out lab** (0.669 vs 0.660) while leaking less identity
+   (0.865 vs 0.938). The encoder's apparent advantage on pigs lives *entirely in the leaky number.*
+   That is the sharpest single sentence Paper A has.
+2. **Dogs generalise far better than cats or pigs**: held-out-dog context 0.728 (chance 0.333), with a
+   duration-only floor at 0.341 — so it is not a bout-length artifact. Caveat: only 10 dogs, and dog
+   context is confounded with recording session, so this is not a leave-one-session-out number.
+3. **Recovery curves differ in kind.** ~11 labelled clips from the target cat lift WavLM 0.576 → 0.727,
+   which is the random-split ceiling (0.729) — cat "shift" is individual idiosyncrasy a handful of
+   labels fully absorbs. For pigs, 100 labelled clips from the target lab close only **50%** of the gap
+   and are still climbing. eGeMAPS recovers far less in both: the encoder is more *adaptable*, not more
+   *transferable*.
+
+## Honesty notes
+- **Bats excluded from the fit**: no bat context label is decodable at all (0.301 vs 0.250 chance), so
+  their near-zero inflation is a degenerate zero. Including them would pump pooled r to 0.874 purely as
+  leverage; within-bats the correlation is *negative*.
+- Pig WavLM L0 was recomputed from scratch as a reproduction check and matched to within 0.002.
+
+---
+
+# ITERATION 8 — ESP's multiband package vs our time-expansion baseline (bats)
+
+Ran ESP's own `multiband-audio` v0.1.0 (Sarkar et al. 2026, arXiv 2604.27936) on the 10-way bat
+identity task, 1,000 calls (100 × 10 emitters), chance 0.100, best layer:
+
+| encoder | baseband | time-expansion 4× | multiband mean | multiband concat |
+|---|---|---|---|---|
+| WavLM-base-plus | 0.587 (L2) | **0.666** (L1) | 0.604 (L2) | 0.637 (L4) |
+| AVES-bio | 0.608 (L9) | **0.641** (L4) | 0.561 (L2) | 0.616 (L8) |
+
+Paired tests (same folds): time-expansion − multiband-concat = +0.029 (p=0.091) and +0.025 (p=0.13);
+time-expansion − multiband-mean = +0.062 (p=3e-4) and +0.080 (p=5e-6).
+
+**Answer: multiband did not beat time-expansion here — but this does NOT refute ESP's method.**
+We tested only the *parameter-free* fusions (mean, concat). The paper's headline is **adaptive** fusion
+(`gp` gated-pool is their default, plus MoE / hybrid / self-attention), which is learned end-to-end.
+A learned gate could down-weight the weak bands and plausibly close a 0.03 gap. `MultibandWrapper`
+requires a backbone returning one (N,D) vector plus a trained head, which is incompatible with our
+frozen-encoder + per-layer logistic probe, so we used the package's band waveforms and fused ourselves.
+
+## Two verifiable observations about the v0.1.0 package (worth reporting upstream)
+
+1. **The shipped heterodyne is a single-phase mixer, so each non-baseband band folds 2:1.** Verified
+   with tones: 9 kHz and 15 kHz both land at 3 kHz in band 1; a sine exactly at the 12 kHz band centre
+   is nulled (rms 0.0006) while a cosine passes (0.500). There is no quadrature path.
+2. **Bands overlap substantially.** The band-pass is a single 2nd-order biquad, not a brick wall — a
+   15 kHz tone shows rms 0.287 in band 1 *and* 0.176 in band 2 (≈ −4 dB leak). The README's
+   "non-overlapping bands" is aspirational at v0.1.0.
+
+Neither is a criticism of the paper's idea; both are concrete, checkable notes about the released code.
+
+## Two findings worth keeping
+
+- **Energy does not predict usefulness.** 76.2% of bat call energy sits in band 1 (8–16 kHz), yet
+  band 0 alone (0–8 kHz) out-probes band 1 alone by ~9 points (0.600 vs 0.516 WavLM).
+- **Mean-fusion is actively harmful** for AVES: −0.049 against its own baseband band (p=0.004).
+  Averaging dilutes the one informative band.
+
+## Methodological hygiene from this run
+- **Built-in noise ruler:** `baseband` and `band0_only` are the same 0–8 kHz audio down two different
+  resamplers; they differ by 0.013 / 0.002 (n.s.). So ~1–3 points is the noise floor on this task.
+- n=1,000 (half of the `out_bats` run), which is why everything sits ~4 points below it
+  (0.587 vs 0.631; 0.666 vs 0.700) — the *ordering* replicates, which is the part that matters.
+- Best-layer selection is not cross-validated and `C=0.5` was not swept across 768-d vs 3072-d.
+
+## Why this matters beyond the number
+This is the strongest cold-email content we have for ESP: a reproduction of their baseline comparison
+on a dataset they did not use, plus two tone-verified observations about their released code — and
+Gagan Narula, our #1 contact, is a co-author on that paper.
+
+---
+
+# ITERATION 9 — chapters 1 and 4 meet: conformal coverage is per-group broken
+
+Our conformal code had only ever been validated on synthetic data. The audit said per-animal accuracy
+varies wildly (0.00–0.86). Prediction: **marginal coverage will look perfect while per-group coverage
+is catastrophic.** Run on real out-of-fold scores, α=0.10 (nominal 0.90), WavLM L9, calibration/test
+split by group, 40 repeats.
+
+| dataset | marginal | per-group **min** | IQR | groups <0.80 | mean set size |
+|---|---|---|---|---|---|
+| cats (20 individuals) | 0.904 | **0.412** | 0.186 | **5/20** | 1.32 |
+| dogs (10 individuals) | 0.892 | 0.624 | 0.059 | 2/10 | 1.10 |
+| pigs (6 labs) | 0.891 | 0.735 | 0.079 | 1/6 | 1.67 |
+
+Worst offenders: `cat_TIG01` 0.412, `dog_Freid` 0.624, pig lab `IASPB` 0.735. **The headline number is
+exactly on target and one cat in five is getting a guarantee that is 50 points short.**
+
+**It is not a bug in our code.** Synthetic exchangeable control: 0.9048 over 2,000 trials. Real scores
+under an *exchangeable within-group* split: cats 0.907, dogs 0.903, pigs 0.901. And the per-group
+spread is just as wide under the exchangeable split — so this is the **conditional-coverage gap**, a
+known theoretical limitation of conformal prediction, demonstrated on real bioacoustic data.
+
+## Does the textbook fix work? Two important negatives and one positive
+
+- **Mondrian by predicted class — no.** Worst cat 0.412 → 0.425; worst dog unchanged at 0.624; for pigs
+  marginal coverage drops *below* nominal (0.873) and the IQR widens.
+- **Mondrian by group, in deployment — structurally vacuous.** Under a group-disjoint split, no test
+  group has calibration data, so every group falls back to the pooled threshold. Verified
+  programmatically: it is bit-for-bit identical to pooled (0/20, 0/10, 0/6 groups get their own
+  threshold). *The obvious fix does not exist precisely when you need it.*
+- **Mondrian by group, given some of that group's own labels — complete repair, where data allows.**
+  Dogs worst 0.696 → **0.905**, IQR 0.068 → 0.039, 0/10 below 0.80. Pigs worst 0.775 → **0.898**,
+  IQR 0.065 → **0.002**. But **cats: no repair at all** (0.467 → 0.467, still 6/20 below 0.80) —
+  at α=0.10 you need **≥9 calibration clips from that individual**, and only 6 of 20 cats have enough.
+
+**Practitioner rule that falls out:** *α=0.10 requires ≥9 labelled clips from the animal or site you
+are deploying on. Below that, no per-group guarantee is available at any price.* That dovetails exactly
+with the audit's recovery curve (~11 target-cat clips saturate accuracy).
+
+The repair is also **paid for in set size, unevenly**: `dog_Luke` 1.91 (abstains on almost everything)
+vs `dog_Rudy` 0.91 (emits empty sets). Coverage repaired, usefulness redistributed.
+
+## Shift case: species change breaks even the marginal guarantee
+
+Calibrate on dogs, test on cats: marginal coverage **0.747** at L9 and **0.556** at L6, against a 0.920
+same-species reference; worst cat 0.330, 12/20 below 0.80. Cats→dogs 0.746.
+**Swapping individuals within a species costs nothing marginally; swapping species costs 15–35 points.**
+That is the shift ladder the thesis frame predicts, measured.
+
+## Caveats (in the agent's own README)
+- The extreme cat minima come partly from tiny groups. Restricted to the 15 cats with n≥10, the worst
+  is 0.748, IQR 0.113, 3/15 below 0.80 — the effect survives, less dramatically.
+- Per-group coverage is partly confounded with per-group class prior (pig labs IASPB/IASPC are
+  single-valence by construction, as are six cats).
+- OOF scores are cross-conformal-flavoured rather than a single frozen scorer.
+- Pig sets are barely informative anyway (1.67 mean size at 0.63 probe accuracy).
+
+## What this does to Paper A
+It supplies the "so what". The paper no longer just says *your accuracy is inflated*; it says
+**your uncertainty guarantee is also per-group broken, the standard remedy is unavailable in
+deployment, and here is the labelling threshold at which it becomes available.** That is a concrete,
+actionable failure mode — exactly the ICBINB-BIO genre.
+
+---
+
+# ITERATION 12 — Phase 1 of the encoder plan: identity is removable, site identity is not
+
+Two cheap experiments on cached embeddings (numpy/sklearn, no GPU, no retraining), testing the core
+premise of `paper/ENCODER_PLAN.md`: *the information is there, it is just dominated by nuisance.*
+
+## 1a. Fusion — eGeMAPS + WavLM beats either, slightly
+
+Pigs (held-out lab): WavLM 0.654, eGeMAPS 0.641, **fused 0.668 (+0.014 over the better one)**.
+So the two feature families do make partly different errors, but the gain is small — consistent with
+them encoding largely the same thing. Cats/dogs skipped: the audit's eGeMAPS arrays cover all 440
+meows while the cross-species subset is the 348 brushing/isolation clips. *(To fix: re-index rather
+than recompute.)*
+
+## 1b. Identity-subspace removal (INLP) — the headline
+
+Estimate identity directions with iterative nullspace projection on **training groups only**, project
+them out, re-run the honest context probe. Report both numbers plus a random-direction control of
+equal rank.
+
+| | identity before | identity after (rank 32) | Δ identity | context before | context after | Δ context |
+|---|---|---|---|---|---|---|
+| **cats** (20 individuals) | 0.721 | **0.256** | **−0.465** | 0.782 | 0.780 | −0.002 |
+| **dogs** (10 individuals) | 0.753 | **0.208** | **−0.545** | 0.846 | 0.849 | +0.003 |
+| **pigs** (6 **labs**) | 0.941 | 0.828 | −0.113 | 0.654 | 0.662 | +0.008 |
+
+At the context-optimal rank: cats rank 8 → identity −0.244 with context **+0.013**; dogs rank 2 →
+identity −0.114 with context +0.010.
+
+**The random-direction control is the important one.** Projecting out the same number of *random*
+directions leaves identity untouched (cats 0.721 → 0.724; dogs 0.753 → 0.747; pigs 0.941 → 0.940).
+So INLP is removing something specific, not merely shrinking the representation. This is the control
+that separates invariance from compression, and it passes.
+
+## The three-way contrast IS the finding
+
+- **Individual identity is a low-rank, removable subspace.** Eight directions out of 768 carry a
+  quarter of cat identity; thirty-two carry more than half of dog identity — and context is
+  completely unharmed, sometimes marginally better.
+- **Recording-site identity is not.** Thirty-two directions remove only 11 points of pig *lab*
+  identity, which starts at 0.941 and stays at 0.828. Lab identity is distributed across the
+  representation, not concentrated in a subspace.
+
+That distinction is mechanistically sensible — individual voice is a property of one animal's vocal
+apparatus, while a lab is channel plus room plus population plus equipment, which touches everything.
+
+**And it independently reproduces the recovery-curve result.** In the audit, ~11 labelled clips from
+a target cat closed the individual gap completely, while 100 clips from a target pig lab closed only
+half. Two unrelated methods — labelling curves and subspace geometry — arrive at the same structural
+claim: *individual shift is simple and cheap to fix; site shift is deep and neither labels nor linear
+projection dispatch it.*
+
+## What this licenses, and what it does not
+
+It licenses a practical tool: an identity-invariant projection for individual-level nuisance, free,
+post-hoc, on any frozen encoder, with the honest evaluation protocol attached. It does **not** license
+a claim about site invariance — linear projection fails there, and the next thing to try is a
+nonlinear or adversarial method, which needs training and therefore a GPU.
+
+Figure `figures/invariance.png`; data `results/out_invariance/results.json`; code
+`experiments/encoder/phase1_invariance.py`.
+
+---
+
+# ITERATION 13 — site invariance: two methods fail, and the failure is well characterised
+
+Following iteration 12 (individual identity is a removable low-rank subspace; pig LAB identity is not),
+two follow-ups asked whether we simply stopped too early or used too weak a method.
+
+## Deeper linear projection — it plateaus, definitively
+
+INLP on pig lab identity, all the way to rank 384 of 768 dimensions:
+
+| rank | valence (held-out lab) | lab identity | lab identity, random dirs |
+|---|---|---|---|
+| 0 | 0.654 | 0.941 | 0.941 |
+| 32 | 0.662 | 0.828 | 0.940 |
+| 64 | 0.665 | **0.819** | 0.941 |
+| 128 | 0.665 | 0.820 | 0.940 |
+| 256 | 0.665 | 0.820 | 0.935 |
+| 384 | 0.665 | 0.819 | 0.937 |
+
+**Flat from rank 64 onward.** Deleting half the dimensions removes nothing further. This is not
+"we didn't look hard enough" — linear projection provably saturates at 0.82, still far above the
+0.167 chance level. Valence is untouched throughout (+0.011), so nothing is being destroyed either.
+
+## Domain-adversarial training — actively counterproductive
+
+A gradient-reversal MLP (768→256→128, context head + lab head behind a GRL), λ swept 0→3:
+
+| λ | pigs ctx / lab | cats ctx / id | dogs ctx / id |
+|---|---|---|---|
+| 0 (plain MLP, no adversary) | 0.617 / 0.878 | 0.740 / 0.581 | 0.834 / 0.562 |
+| 0.3 | 0.655 / 0.904 | 0.766 / **0.680** | 0.827 / 0.620 |
+| 1.0 | 0.648 / 0.905 | 0.737 / 0.648 | 0.856 / **0.662** |
+| 3.0 | 0.662 / 0.894 | 0.742 / 0.608 | 0.840 / 0.630 |
+
+**Turning the adversary up made group identity MORE decodable, not less.** Whatever removal the MLP
+achieves comes from its 768→128 bottleneck, not from the adversarial objective.
+
+This is the textbook DANN failure mode and worth stating precisely: the adversary only defeats *its
+own* discriminator head. We measure afterwards with a **fresh** logistic probe, which finds the
+information sitting where it always was. Beating the adversary during training is not evidence of
+invariance — a point the invariance literature makes and that this reproduces cleanly.
+
+## Head-to-head
+
+| | raw ctx / id | linear INLP | adversarial DANN |
+|---|---|---|---|
+| cats | 0.782 / 0.721 | **0.780 / 0.256** | 0.740 / 0.581 |
+| dogs | 0.846 / 0.753 | **0.849 / 0.208** | 0.834 / 0.562 |
+| pigs | 0.654 / 0.941 | 0.665 / **0.819** | 0.617 / 0.878 |
+
+**The 30-line linear projection beats the trained neural network on every dataset** — 2–3× more
+identity removed, and it preserves context better (the MLP also loses accuracy).
+
+That is now the fourth time on this project the simpler method wins under honest evaluation:
+eGeMAPS matched WavLM; time-expansion beat multiband fusion; hand-crafted features beat the encoder
+on pigs under held-out lab; and now linear erasure beats adversarial training.
+
+## Status of the site-invariance problem
+Individual nuisance: **solved**, free, post-hoc. Site nuisance: **open**, and now characterised —
+not low-rank, not reachable by gradient reversal. Remaining candidates (LEACE with its formal
+guarantee, WCCN from speaker verification, CORAL, nonlinear probing to test whether the information
+is even linearly held) are under test.
+
+Code `experiments/encoder/{phase1_invariance,phase1b_adversarial,deep_rank}.py`;
+data `results/out_invariance/`, `results/out_adversarial/`.
+
+---
+
+# ITERATION 14 — allometric pitch normalisation: tested, and it does not work
+
+The idea in `paper/ENCODER_PLAN.md` §2, described there as "the idea I think is genuinely ours" and
+"the first thing I would test": body mass predicts fundamental frequency across mammals, so raw pitch
+is not comparable between a 3 kg cat and a 300 kg pig — but *pitch relative to what the body predicts*
+might be. An animal calling higher than its size predicts is straining, in any species.
+
+**It does not work. Not over raw pitch, not over within-species z-scoring, and not over having no
+pitch feature at all.**
+
+## The transfer test (mean balanced accuracy, 6 directed species pairs)
+
+| no pitch at all | raw F0 | allometric residual | allometric, law fitted excluding test species | within-species z-scored F0 |
+|---|---|---|---|---|
+| **0.577** | 0.572 | **0.578** | 0.580 | 0.569 |
+
+Everything sits within 0.022. Allometric beats raw by +0.009 (sign test p=0.22), beats within-species
+z by +0.011 (p=0.22), and beats **dropping pitch entirely** by +0.003 (p=0.69). Only 1 of 6 pairs
+clears its permutation null — and the no-pitch baseline clears that one too. Raw F0 clears none.
+
+## Why it fails, and why I should have seen it
+
+Probe weights on the pitch feature (positive = predicts negative affect): **cat −0.20, dog −1.24,
+pig +0.21.** The pigs flip sign.
+
+**No location or scale correction can repair a sign flip.** Allometric normalisation shifts and
+rescales the pitch axis; it cannot reverse it. I proposed this after noticing that spectral cues point
+in opposite directions across species — and then proposed a fix that is mathematically incapable of
+addressing opposite directions. That was a conceptual error, not a data problem.
+
+Only **duration** agrees across all three species (+0.27 / +1.43 / +1.25), and duration+energy alone
+*is* the 0.577 baseline that every fancier variant merely matches.
+
+## The genuine positive, orthogonal to the hypothesis
+
+Within the 10 dogs — the only animals with **real measured body masses** rather than imputed ones —
+log F0 scales with mass at **b = −0.334, R² = 0.48, p = 0.026**. That is an independent replication of
+the isometric / carnivore scaling exponent (theory −0.333; Bowling et al. carnivores −0.335) on a
+corpus collected in 2008 for an entirely different purpose. Small, but real.
+
+The cross-species fit is much weaker: b = −0.389, R² = 0.205, **p = 0.068, n.s.**, and dropping one
+species swings it from −0.089 to −0.907. Three species cannot establish an allometric law.
+
+## Methodological findings worth keeping
+
+- **For cats and pigs, "allometry" was species-mean centering in disguise** (r = 0.956 and 0.963),
+  because imputed mass takes only 4 and 3 distinct values. The feature was not doing what its name said.
+- **Permutation nulls are not at 0.5** — they run 0.46–0.67 by pair, because several cats and 2 of 6
+  pig labs are single-class. Reporting these against naive chance would have overstated everything.
+- **F0 extraction failure is not missing-at-random**: 100% success on negative cat clips vs 88% on
+  positive; 49.6% vs 40.2% in pigs. Discarded honestly rather than imputed.
+- **Our pitch tracker flattered the idea.** Validated against Soundwel's own published F0: log-log
+  r = 0.78, with 44% of clips off by more than an octave. Re-running with the corpus's expert F0
+  values puts *every* pitch variant **below** the no-pitch baseline.
+- **Formant dispersion is not measurable on this data** — LPC returns Df ≈ 4000/model-order for all
+  three species and ranks pigs backwards. Cat formant spacing (~2460 Hz) cannot be resolved from a
+  600 Hz harmonic comb inside a 4 kHz band. A physical limit, not a bug.
+- **Segmentation matters**: dog files are 12 s bouts, pig calls 0.3 s. Analysing the focal call rather
+  than the file (validated r = 0.976 against published durations) roughly doubles duration's
+  cross-species affect separation.
+
+## Where this leaves the encoder plan
+
+Layer 4 (metadata) loses its flagship idea. What survives is the finding underneath it: **the only
+cross-species affect cue we can find that has a consistent sign is call duration**, and adding pitch
+in any form adds nothing. That is a cleaner and more surprising sentence than the one I set out to
+write, and it strengthens rather than weakens the transfer chapter — it explains *why* the transfer is
+small and covariance-relative rather than a shared direction.
+
+Fifth instance of the pattern: the no-pitch baseline beats every pitch-based elaboration.
+
+Data `results/out_allometry/`; code `experiments/allometry/`.
+
+---
+
+# ITERATION 15 — CORRECTION: site identity *is* low-rank. I was wrong.
+
+Iterations 12–13 claimed **"individual identity is a low-rank removable subspace; recording-site
+identity is not."** The second half is **false**, and it was published here, in two commit messages,
+and in both repositories. Correcting it in full.
+
+## What is actually true
+
+**LEACE** (Belrose et al., least-squares concept erasure) drives 6-way lab decodability from **0.941
+to 0.291 — the majority-class floor — at rank 5**, in closed form. Five is exactly *#labs − 1*. Site
+identity is not merely low-rank; it sits in the smallest subspace it possibly could.
+
+INLP stalled at 0.82 for a conceptual reason, not a capacity one. **INLP removes the max-likelihood
+*discriminative* direction; the condition for a linear probe to fail is *equal class means*, and only
+LEACE targets that.** The agent also checked the obvious bug hypothesis — our `inlp_directions`
+projects a z-space coefficient out of un-scaled space, so the correct direction is `w/σ` — and fixing
+it changes nothing (0.934 vs 0.925 at rank 5). The method was wrong, not the implementation.
+
+| method | rank | valence (held-out lab) | lab, linear probe | lab, MLP probe |
+|---|---|---|---|---|
+| raw | – | 0.654 | 0.941 | 0.949 |
+| INLP | 32 | 0.665 | 0.903 | – |
+| **LEACE** | **5** | 0.657 | **0.291** (floor) | **0.918** |
+| CORAL | – | 0.651 | 0.291 | **0.694** |
+| per-lab z-score *(transductive)* | – | **0.506** | 0.291 | 0.970 |
+
+## The finding underneath the correction
+
+**The leak is second-order.** After LEACE drives *linear* lab decodability to the floor, an **MLP
+still reads the lab at 0.918**. Lab covariances differ from pooled by 59–115% in Frobenius norm.
+INLP, LEACE, NAP and WCCN are all first-order methods and are blind to this *by construction*.
+
+That also **explains the DANN failure from iteration 13 without appealing to optimisation pathology**
+— the information genuinely remains, in second-order structure no first-order surgery touches.
+
+The one second-order method that does reach it, CORAL, takes the task with it: MLP lab 0.949 → 0.694,
+but valence collapses to 0.516. Compression, not invariance. Erasing in a 1024-dim random-Fourier
+space reproduces the same pattern one level up.
+
+**No method improved valence** under a paired cluster bootstrap. The only significant effect in the
+whole study is that per-lab z-scoring is significantly *harmful* (−0.123, CI [−0.199, −0.056]).
+
+## A caveat that lands on Paper A
+
+**On Soundwel, the lab name alone predicts valence at 0.766 — higher than the 0.654 the embedding
+earns honestly.** IASPB is 100% positive and IASPC 100% negative by construction. And
+leave-one-*context*-out scores 0.569, *worse* than leave-one-lab-out's 0.654, with zero contexts
+shared across all six labs.
+
+So **leave-one-lab-out on this corpus conflates site shift with label-distribution shift and context
+novelty.** Our pig numbers stand as measured, but the interpretation must be hedged: they are not a
+clean site-shift measurement, and the eGeMAPS-vs-WavLM comparison inherits that. The evaluation is
+also underpowered — only 4 of 6 labs are scorable, baseline 95% CI [0.526, 0.725].
+
+## Two protocol traps, one of which infected our earlier numbers
+
+1. **Fitting the eraser on all data and then probing out-of-fold gives LEACE 0.10 — *below* the 0.167
+   chance level.** That is a fold-anticorrelation artifact, and it is the protocol our earlier INLP
+   numbers used. Erasers must be re-fit inside each fold.
+2. NAP-2's apparent +0.030 win is an artifact of pooling the two single-class labs; on the 4 scorable
+   labs it is **−0.015**.
+
+Also recorded: projecting *onto* the 5-d site subspace scored 0.718 and looked exciting, but a random
+5-d subspace reaches 0.714. Not a finding.
+
+## Revised position
+
+Individual nuisance: removable, cheaply, first-order. Site nuisance: **linearly removable at rank
+#labs−1, but the information survives in second-order structure**, and every method that reaches it
+destroys the task. The honest conclusion is that this is a **study-design and encoder-training
+problem** — record shared contexts across sites, or use a second-order-aware training objective — not
+something representation surgery fixes after the fact.
+
+Data `results/out_site/`; code `experiments/site/`.
+
+---
+
+# ITERATION 16 — we built the tool, and it immediately corrected the paper
+
+*18 Aug 2026. Two things happened: `leakcheck` exists, and the first real dataset we pointed it at
+turned up a defect in a number that is currently in Paper A's abstract.*
+
+## The tool
+
+`leakcheck/` — pip-installable, two dependencies (numpy, scikit-learn), no GPU, no model. It takes
+`(X, y, groups)` and reports the three numbers this project has been reporting by hand since
+iteration 7:
+
+```
+leakcheck audit embeddings.npy --meta clips.csv --label context --group animal_id
+```
+
+| | |
+|---|---|
+| honest | task accuracy, whole groups held out |
+| shuffled | task accuracy, random split |
+| identity | how well the same features recover the group |
+
+Plus, because we kept getting caught by them ourselves: a permutation null **at the automatically
+chosen unit** (within-group when the label varies inside a group, group-level when it does not); a
+bootstrap interval over **groups, not clips**; per-group scores; and design diagnostics that run
+before any model is fitted.
+
+`leakcheck erase` runs LEACE / INLP / a random-projection control with the eraser **re-fitted inside
+every fold** — the protocol trap from iteration 15 is now impossible to fall into by accident — and
+reports two numbers a linear probe alone would hide:
+
+- identity on **groups the eraser never saw** (does the transform transfer, or did it memorise?)
+- identity under an **RBF probe** (is the leak second-order, i.e. iteration 15's finding?)
+
+Run against our own pig data it independently reproduces iteration 15: LEACE at **rank 5**, lab
+identity 0.541 → 0.242 in-sample, task 0.436 → 0.456. And it adds a result we had not measured:
+**on labs the eraser never saw, identity is 0.773.** The transform memorises the training labs'
+means; it does not remove a lab axis. Combined with the RBF probe recovering 0.661, the verdict line
+reads *"LINEAR AND IN-SAMPLE ONLY — do not ship this as invariance,"* which is the correct thing for
+a tool to say about our own best method.
+
+21 tests, all passing, including one that fails if imputation ever stops being fold-local.
+
+## What it found in ninety seconds: the pig feature table has a hole
+
+The design diagnostics flagged **700 rows with no features at all** — every one of the 18 published
+measurements absent. They are:
+
+- all from **NMBU** (51% of that lab's 1,381 clips)
+- all labelled **negative valence**, with no positives among them
+- after mean imputation, **one identical constant vector**, 700 times
+
+The paper says the corpus's own feature set "scores below chance (0.386) once a lab is held out."
+That number reproduces exactly. But it is produced by imputing 700 clips the published feature table
+simply does not cover, and all of them carry one label.
+
+Recomputed with `experiments/audit/audit.py` itself, same estimator, same protocol:
+
+| | held-out lab | random | inflation | identity | n |
+|---|---|---|---|---|---|
+| as published | **0.386** | 0.575 | +0.189 | 0.513 | 5,031 |
+| 700 empty rows dropped | **0.537** | 0.745 | **+0.208** | 0.650 | 4,331 |
+
+**The below-chance claim does not survive.** 0.537 is at chance, not below it, so "the mapping
+inverts between labs" is not supported — the supportable claim is that this feature set retains *no*
+cross-lab valence signal.
+
+**The leakage claim gets stronger.** Inflation rises from +0.189 to +0.208, and the random-split
+score rises from 0.575 to 0.745. Removing the degenerate block makes the paper's actual thesis
+cleaner, not weaker.
+
+Paper A updated: abstract, contribution (3), the §4.2 paragraph, and a second table row marked
+`†`. Provenance in `results/out_audit/pig_missing_features.json`.
+
+## Why this is the third-most-useful thing that happened this week
+
+The check that caught it is four lines of numpy and runs before any model is fitted. We have been
+staring at this dataset since 15 August, across fifteen iterations, and did not look. That is the
+argument for the tool existing: not that the analysis is clever, but that the cheap checks only get
+run when something runs them for you.
+
+It also generalises. `leakcheck` now warns when **missingness itself predicts the label** — Cramér's
+V of 0.21 on this corpus. If a model can tell which extractions failed, and failure correlates with
+the label, it can score without hearing anything.
+
+## Related: what ESP shipped in May
+
+Earth Species published *"From What to Who?"* (5 May 2026): BirdAVES adapted into a 173-way
+individual classifier for zebra finches, producing "who-sang-when" timelines. The post does not state
+the split protocol. This is the same quantity we measure as `identity` — for them a capability, for
+us the contaminant. Both readings are correct and they are the same number, which is a better framing
+for the outreach email than anything we had.
+
+Code `leakcheck/`; tests `leakcheck/tests/`; report cards write to HTML, Markdown or JSON.

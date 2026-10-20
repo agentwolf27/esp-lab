@@ -1,0 +1,62 @@
+{
+ "lowpass4k_L3": {
+  "ctx_flip": 0.12987012987012986,
+  "binary_identity_flip": 0.1547236527839976,
+  "ratio": 1.1913721264367816
+ },
+ "lowpass4k_L6": {
+  "ctx_flip": 0.009553664726078518,
+  "binary_identity_flip": 0.06731415136587551,
+  "ratio": 7.045898437500002
+ },
+ "lowpass4k_L9": {
+  "ctx_flip": 0.011363636363636364,
+  "binary_identity_flip": 0.047412860128377365,
+  "ratio": 4.172331691297208
+ },
+ "lowpass4k_L12": {
+  "ctx_flip": 0.012613822958650545,
+  "binary_identity_flip": 0.03845443349753695,
+  "ratio": 3.0485946745562136
+ },
+ "reverb_L3": {
+  "ctx_flip": 0.13903194506642783,
+  "binary_identity_flip": 0.18473932676518884,
+  "ratio": 1.3287545295933432
+ },
+ "reverb_L6": {
+  "ctx_flip": 0.11080011942080907,
+  "binary_identity_flip": 0.22591431556948796,
+  "ratio": 2.0389356685752777
+ },
+ "reverb_L9": {
+  "ctx_flip": 0.11561427078668457,
+  "binary_identity_flip": 0.22126530079116283,
+  "ratio": 1.913823434473854
+ },
+ "reverb_L12": {
+  "ctx_flip": 0.14539483505000744,
+  "binary_identity_flip": 0.20432620540379165,
+  "ratio": 1.405319558521561
+ },
+ "noise+10dB_L3": {
+  "ctx_flip": 0.295230631437528,
+  "binary_identity_flip": 0.2925529929840275,
+  "ratio": 0.9909303501453673
+ },
+ "noise+10dB_L6": {
+  "ctx_flip": 0.2325347066726377,
+  "binary_identity_flip": 0.26841972682489923,
+  "ratio": 1.1543211362542127
+ },
+ "noise+10dB_L9": {
+  "ctx_flip": 0.191166592028661,
+  "binary_identity_flip": 0.26691110613524405,
+  "ratio": 1.3962225475841874
+ },
+ "noise+10dB_L12": {
+  "ctx_flip": 0.28136662188386324,
+  "binary_identity_flip": 0.29679989550679203,
+  "ratio": 1.0548511174481066
+ }
+}
